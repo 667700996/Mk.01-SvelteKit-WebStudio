@@ -12,32 +12,32 @@ export interface WorkProject {
 export const sampleProjects: WorkProject[] = [
   {
     slug: "neon-metropolis",
-    title: "Neon Metropolis Launchverse",
+    title: "Kinesis",
     coverImage: "/images/work/neon-metropolis-cover.jpg",
     summary:
-      "WebGL-driven product reveal with procedurally animated cityscapes.",
-    year: "2024",
-    tags: ["WebGL", "Motion", "Product Launch"],
-    industry: "Entertainment",
+      "A living identity that behaves less like a logo and more like a force of nature.",
+    year: "2026",
+    tags: ["WebGL", "Spatial Identity", "Motion"],
+    industry: "Culture & Technology",
   },
   {
     slug: "atlas-labs",
-    title: "Atlas Labs System",
+    title: "Aether",
     coverImage: "/images/work/atlas-labs-cover.jpg",
     summary:
-      "Design-engineering system enabling 10x faster R&D release cadence.",
-    year: "2023",
-    tags: ["Design System", "Tooling", "Accessibility"],
-    industry: "Enterprise",
+      "Invisible infrastructure translated into a precise, cinematic product experience.",
+    year: "2025",
+    tags: ["Product Narrative", "Systems", "Accessibility"],
+    industry: "Infrastructure",
   },
   {
     slug: "flowstate",
-    title: "Flowstate Mindful Productivity",
+    title: "Mono/R",
     coverImage: "/images/work/flowstate-cover.jpg",
     summary:
-      "Adaptive motion language integrated with biometric feedback loops.",
-    year: "2024",
-    tags: ["Product Design", "Mobile", "Animation"],
-    industry: "Health & Wellness",
+      "An adaptive focus system where motion responds to human rhythm.",
+    year: "2025",
+    tags: ["Product Design", "Adaptive Motion", "Prototype"],
+    industry: "Human Performance",
   },
 ];

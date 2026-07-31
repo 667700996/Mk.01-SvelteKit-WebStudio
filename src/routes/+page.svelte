@@ -29,10 +29,10 @@
 			index: '03',
 			title: 'Mono/R',
 			slug: 'flowstate',
-			discipline: 'Digital flagship / Art direction / Commerce',
-			statement: 'A brutalist retail system where typography becomes interface, image, and motion.',
-			metric: '+38%',
-			metricLabel: 'qualified actions',
+			discipline: 'Product design / Adaptive motion / Prototyping',
+			statement: 'An adaptive focus system where motion responds to human rhythm.',
+			metric: '72',
+			metricLabel: 'motion tokens',
 			type: 'monolith'
 		}
 	];
