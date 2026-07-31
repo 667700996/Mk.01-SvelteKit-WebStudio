@@ -1,157 +1,457 @@
 <script lang="ts">
-	import PageSection from '$lib/components/ui/PageSection.svelte';
-	import Image from '$lib/components/ui/Image.svelte';
-	import ScrambleText from '$lib/components/motion/ScrambleText.svelte';
-	import { tilt } from '$lib/components/motion/tilt';
-	import { fly } from 'svelte/transition';
-	import { cubicOut } from 'svelte/easing';
+	import { onMount } from 'svelte';
 	import type { PageData } from './$types';
+	import '../../styles/home.css';
 
 	export let data: PageData;
 
-	const projects = data.projects ?? [];
-	const labs = data.labs ?? [];
+	const visualTypes: Record<string, string> = {
+		'neon-metropolis': 'orbital',
+		'atlas-labs': 'signal',
+		flowstate: 'monolith'
+	};
 
-	const industries = ['All', ...new Set(projects.map((project) => project.industry))];
-	const years = ['All', ...new Set(projects.map((project) => project.year))];
+	let ready = false;
 
-	let selectedIndustry = 'All';
-	let selectedYear = 'All';
-
-	$: filteredProjects = projects.filter((project) => {
-		const industryMatch = selectedIndustry === 'All' || project.industry === selectedIndustry;
-		const yearMatch = selectedYear === 'All' || project.year === selectedYear;
-		return industryMatch && yearMatch;
+	onMount(() => {
+		ready = true;
 	});
 </script>
 
-<PageSection id="work-hero" tone="contrast" padding="xl">
-	<div class="space-y-6">
-		<span class="eyebrow text-secondary/80">Case studies</span>
-		<h1 class="text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl leading-[0.9]">
-			<ScrambleText text="Systems designed to ship." speed={40} />
+<article class:ready class="work-index">
+	<header class="work-index__hero">
+		<div class="work-index__meta">
+			<span>Selected systems / 2024—2026</span>
+			<span>Art direction × Interaction × Code</span>
+		</div>
+		<p class="work-index__eyebrow">A compact archive of things made to move.</p>
+		<h1>
+			<span>Selected</span>
+			<span>systems.</span>
 		</h1>
-		<p class="max-w-3xl text-lg text-base-content/70 sm:text-xl leading-relaxed">
-			Every engagement blends strategy, systems, and expressive engineering. Filter by industry or
-			year to explore how the same codebase adapts to each brief.
-		</p>
-	</div>
-
-	<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3 pt-8">
-		<div class="p-6 rounded-2xl border border-base-content/10 bg-base-100/50 backdrop-blur-md" use:tilt={{ max: 5, scale: 1.02 }}>
-			<p class="text-5xl font-bold text-base-content tracking-tighter">17+</p>
-			<p class="mt-2 text-xs uppercase tracking-[0.25em] text-base-content/50 font-bold">
-				Global collaborators
+		<div class="work-index__intro">
+			<p>
+				Three case studies showing the work behind the spectacle: the decisions, systems, and
+				performance discipline that make expressive interfaces hold together.
 			</p>
+			<a href="#project-index">Open index ↓</a>
 		</div>
-		<div class="p-6 rounded-2xl border border-base-content/10 bg-base-100/50 backdrop-blur-md" use:tilt={{ max: 5, scale: 1.02 }}>
-			<p class="text-5xl font-bold text-base-content tracking-tighter">48</p>
-			<p class="mt-2 text-xs uppercase tracking-[0.25em] text-base-content/50 font-bold">
-				Experiments live
-			</p>
-		</div>
-		<div class="p-6 rounded-2xl border border-base-content/10 bg-base-100/50 backdrop-blur-md" use:tilt={{ max: 5, scale: 1.02 }}>
-			<p class="text-5xl font-bold text-base-content tracking-tighter">92</p>
-			<p class="mt-2 text-xs uppercase tracking-[0.25em] text-base-content/50 font-bold">Client NPS</p>
-		</div>
-	</div>
-</PageSection>
+	</header>
 
-<PageSection id="work-filters" padding="compact">
-	<div class="flex flex-wrap gap-4 p-4 rounded-xl border border-base-content/10 bg-base-200/30 backdrop-blur-sm">
-		<label class="flex flex-col gap-1.5">
-			<span class="text-[0.65rem] uppercase tracking-widest font-bold text-base-content/50">Industry</span>
-			<select bind:value={selectedIndustry} class="select select-sm select-bordered bg-base-100/50 min-w-[160px]">
-				{#each industries as industry}
-					<option value={industry}>{industry}</option>
-				{/each}
-			</select>
-		</label>
-		<label class="flex flex-col gap-1.5">
-			<span class="text-[0.65rem] uppercase tracking-widest font-bold text-base-content/50">Year</span>
-			<select bind:value={selectedYear} class="select select-sm select-bordered bg-base-100/50 min-w-[120px]">
-				{#each years as year}
-					<option value={year}>{year}</option>
-				{/each}
-			</select>
-		</label>
-	</div>
-</PageSection>
-
-<PageSection id="work-grid">
-	{#if filteredProjects.length === 0}
-		<div
-			class="py-20 rounded-3xl border border-dashed border-base-content/20 bg-base-100/30 text-center"
-			in:fly={{ y: 20, duration: 400 }}
-		>
-			<span class="text-4xl block mb-4 opacity-50">∅</span>
-			<p class="text-lg text-base-content/70">No projects found in this sector.</p>
-			<button class="btn btn-outline btn-primary mt-6" on:click={() => { selectedIndustry = 'All'; selectedYear = 'All'; }}>
-				Reset All Filters
-			</button>
-		</div>
-	{:else}
-		<div class="grid gap-x-8 gap-y-16 md:grid-cols-2 lg:grid-cols-3">
-			{#each filteredProjects as project, i (project.slug)}
-				<article 
-					class="group" 
-					use:tilt={{ max: 8, scale: 1.02, glare: true }}
-					in:fly={{ y: 30, delay: i * 80, duration: 500, easing: cubicOut }}
-				>
-					<a href={`/work/${project.slug}`} class="block space-y-5">
-						<div class="rounded-2xl overflow-hidden shadow-2xl relative aspect-[4/3]">
-							<Image
-								src={project.coverImage ?? `/images/work/${project.slug}-cover.jpg`}
-								alt={project.title}
-								className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-							/>
-							<div class="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors"></div>
-						</div>
-						
-						<div class="space-y-2">
-							<div class="flex justify-between items-center text-xs uppercase tracking-widest font-bold text-base-content/50">
-								<span>{project.industry}</span>
-								<span class="text-primary">{project.year}</span>
-							</div>
-							<h2 class="text-2xl font-bold text-base-content group-hover:text-primary transition-colors">{project.title}</h2>
-							<p class="text-base text-base-content/70 line-clamp-2">{project.summary ?? project.description}</p>
-							
-							<div class="flex flex-wrap gap-2 pt-2">
-								{#each project.tags.slice(0, 3) as tag}
-									<span class="px-2 py-1 rounded-md bg-base-content/5 text-[0.65rem] uppercase tracking-wider text-base-content/60 border border-base-content/5">
-										#{tag}
-									</span>
-								{/each}
-							</div>
-						</div>
-					</a>
-				</article>
-			{/each}
-		</div>
-	{/if}
-</PageSection>
-
-<PageSection id="work-labs" tone="subtle">
-	<div class="space-y-8 text-center max-w-3xl mx-auto mb-12">
-		<span class="eyebrow text-secondary/80">R&D Pipeline</span>
-		<h2 class="text-4xl font-bold">Experiments that fuel the work.</h2>
-	</div>
-
-	<div class="grid gap-6 md:grid-cols-3">
-		{#each labs as experiment, i}
-			<a 
-				href={`/labs/${experiment.slug}`} 
-				class="p-6 rounded-2xl border border-base-content/10 bg-base-100/60 hover:border-primary/30 transition-colors group block" 
-				use:tilt={{ max: 3, scale: 1.01 }}
-				in:fly={{ y: 20, delay: (filteredProjects.length * 50) + (i * 50), duration: 500 }}
-			>
-				<h3 class="text-xl font-bold text-base-content group-hover:text-primary transition-colors">{experiment.title}</h3>
-				<p class="mt-2 text-sm text-base-content/70">{experiment.summary}</p>
-				<span class="mt-4 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-base-content/50 group-hover:text-primary transition-colors">
-					Access Data
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
-				</span>
+	<section class="work-index__projects" id="project-index" aria-label="Selected projects">
+		{#each data.projects as project, index}
+			<a href="/work/{project.slug}" class="archive-project">
+				<div class="archive-project__meta">
+					<span>0{index + 1}</span>
+					<span>{project.industry}</span>
+					<span>{project.year}</span>
+				</div>
+				<div class="archive-project__visual">
+					<div class="project-art project-art--{visualTypes[project.slug]} active" aria-hidden="true">
+						{#if visualTypes[project.slug] === 'orbital'}
+							<div class="orbital__core"></div>
+							<div class="orbital__ring orbital__ring--a"></div>
+							<div class="orbital__ring orbital__ring--b"></div>
+							<div class="orbital__ring orbital__ring--c"></div>
+						{:else if visualTypes[project.slug] === 'signal'}
+							<div class="signal__beam"></div>
+							<div class="signal__disc"></div>
+							<div class="signal__grid"></div>
+						{:else}
+							<div class="monolith__block monolith__block--a"></div>
+							<div class="monolith__block monolith__block--b"></div>
+							<div class="monolith__type">R</div>
+						{/if}
+					</div>
+					<span class="archive-project__open">View case ↗</span>
+				</div>
+				<div class="archive-project__copy">
+					<h2>{project.title}</h2>
+					<p>{project.summary}</p>
+					<div>
+						{#each project.tags as tag}
+							<span>{tag}</span>
+						{/each}
+					</div>
+				</div>
 			</a>
 		{/each}
-	</div>
-</PageSection>
+	</section>
+
+	<section class="work-index__note">
+		<p>Different surfaces.<br />One standard of care.</p>
+		<div>
+			<span>Looking for the experiments?</span>
+			<a href="/#lab">Enter the live lab ↗</a>
+		</div>
+	</section>
+
+	<section class="work-index__contact">
+		<p>Have a difficult idea?</p>
+		<a href="mailto:studio@mk1.dev?subject=Portfolio%20conversation">
+			Let’s make<br />it tangible. <span>↗</span>
+		</a>
+	</section>
+</article>
+
+<style>
+	.work-index {
+		--gutter: clamp(18px, 3vw, 50px);
+		overflow: clip;
+		background: #080907;
+		color: #f0f0e8;
+	}
+
+	.work-index__hero {
+		position: relative;
+		display: flex;
+		min-height: 100svh;
+		flex-direction: column;
+		justify-content: flex-end;
+		padding: 125px var(--gutter) 32px;
+		border-bottom: 1px solid rgba(240, 240, 232, 0.15);
+		background:
+			linear-gradient(to right, rgba(240, 240, 232, 0.045) 1px, transparent 1px),
+			#080907;
+		background-size: calc((100vw - var(--gutter) * 2) / 12) 100%;
+	}
+
+	.work-index__meta {
+		position: absolute;
+		inset: 96px var(--gutter) auto;
+		display: flex;
+		justify-content: space-between;
+		color: rgba(240, 240, 232, 0.42);
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 8px;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+	}
+
+	.work-index__eyebrow {
+		margin: 0 0 28px;
+		color: #d7ff55;
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 9px;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		opacity: 0;
+		transform: translateY(20px);
+		transition: 0.8s 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+
+	.work-index h1 {
+		margin: 0;
+		font-family: 'Syne', sans-serif;
+		font-size: clamp(96px, 16.8vw, 285px);
+		font-weight: 600;
+		letter-spacing: -0.095em;
+		line-height: 0.63;
+		text-transform: uppercase;
+	}
+
+	.work-index h1 span {
+		display: block;
+		width: fit-content;
+		opacity: 0;
+		transform: translateY(0.35em);
+		transition: 1s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+
+	.work-index h1 span:last-child {
+		margin-left: 0.16em;
+		color: transparent;
+		-webkit-text-stroke: 1.5px #f0f0e8;
+		transition-delay: 80ms;
+	}
+
+	.ready .work-index__eyebrow,
+	.ready h1 span {
+		opacity: 1;
+		transform: translateY(0);
+	}
+
+	.work-index__intro {
+		display: flex;
+		align-items: flex-end;
+		justify-content: space-between;
+		margin-top: clamp(60px, 9vh, 105px);
+		border-top: 1px solid rgba(240, 240, 232, 0.15);
+		padding-top: 18px;
+	}
+
+	.work-index__intro p {
+		max-width: 500px;
+		margin: 0;
+		color: rgba(240, 240, 232, 0.62);
+		font-size: 14px;
+		line-height: 1.6;
+	}
+
+	.work-index__intro a {
+		border-bottom: 1px solid rgba(240, 240, 232, 0.35);
+		padding-bottom: 7px;
+		color: #f0f0e8;
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 8px;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+	}
+
+	.work-index__projects {
+		padding: clamp(110px, 15vw, 220px) var(--gutter);
+		background: #f0f0e8;
+	}
+
+	.archive-project {
+		display: grid;
+		grid-template-columns: minmax(130px, 0.25fr) minmax(0, 1fr) minmax(280px, 0.52fr);
+		gap: clamp(24px, 4vw, 70px);
+		border-top: 1px solid rgba(8, 9, 7, 0.2);
+		padding: clamp(60px, 8vw, 120px) 0;
+		color: #080907;
+	}
+
+	.archive-project:last-child {
+		border-bottom: 1px solid rgba(8, 9, 7, 0.2);
+	}
+
+	.archive-project__meta {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 8px;
+		letter-spacing: 0.09em;
+		text-transform: uppercase;
+	}
+
+	.archive-project__meta span:first-child {
+		margin-bottom: auto;
+		color: rgba(8, 9, 7, 0.35);
+	}
+
+	.archive-project__visual {
+		position: relative;
+		aspect-ratio: 1.24;
+		overflow: hidden;
+		background: #090a08;
+	}
+
+	.archive-project__visual .project-art {
+		transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+
+	.archive-project:hover .project-art {
+		transform: scale(1.04);
+	}
+
+	.archive-project__open {
+		position: absolute;
+		right: 16px;
+		bottom: 16px;
+		z-index: 8;
+		padding: 10px 13px;
+		border-radius: 999px;
+		background: #d7ff55;
+		color: #080907;
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 7px;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		transform: translateY(10px);
+		opacity: 0;
+		transition: 300ms ease;
+	}
+
+	.archive-project:hover .archive-project__open {
+		opacity: 1;
+		transform: translateY(0);
+	}
+
+	.archive-project__copy {
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-end;
+	}
+
+	.archive-project__copy h2 {
+		margin: 0 0 22px;
+		color: #080907;
+		font-family: 'Syne', sans-serif;
+		font-size: clamp(58px, 7vw, 120px);
+		font-weight: 600;
+		letter-spacing: -0.08em;
+		line-height: 0.76;
+	}
+
+	.archive-project__copy p {
+		max-width: 400px;
+		margin: 0 0 45px;
+		color: rgba(8, 9, 7, 0.58);
+		font-size: 14px;
+		line-height: 1.55;
+	}
+
+	.archive-project__copy > div {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 7px;
+	}
+
+	.archive-project__copy > div span {
+		border: 1px solid rgba(8, 9, 7, 0.22);
+		border-radius: 999px;
+		padding: 7px 10px;
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 7px;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+	}
+
+	.work-index__note {
+		display: grid;
+		grid-template-columns: 1fr 0.5fr;
+		gap: 50px;
+		padding: clamp(120px, 16vw, 250px) var(--gutter);
+	}
+
+	.work-index__note > p {
+		margin: 0;
+		font-family: 'Syne', sans-serif;
+		font-size: clamp(64px, 9vw, 155px);
+		font-weight: 500;
+		letter-spacing: -0.075em;
+		line-height: 0.87;
+	}
+
+	.work-index__note > div {
+		align-self: end;
+		display: flex;
+		flex-direction: column;
+		gap: 18px;
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 8px;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+	}
+
+	.work-index__note a {
+		width: fit-content;
+		color: #d7ff55;
+	}
+
+	.work-index__contact {
+		padding: 80px var(--gutter) 40px;
+		background: #d7ff55;
+		color: #080907;
+	}
+
+	.work-index__contact p {
+		margin: 0 0 80px;
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 9px;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+	}
+
+	.work-index__contact a {
+		position: relative;
+		display: block;
+		color: #080907;
+		font-family: 'Syne', sans-serif;
+		font-size: clamp(78px, 15vw, 250px);
+		font-weight: 600;
+		letter-spacing: -0.09em;
+		line-height: 0.72;
+		text-transform: uppercase;
+	}
+
+	.work-index__contact a span {
+		position: absolute;
+		right: 0;
+		bottom: 0;
+		font-size: 0.35em;
+	}
+
+	@media (max-width: 900px) {
+		.archive-project {
+			grid-template-columns: 70px 1fr;
+		}
+
+		.archive-project__copy {
+			grid-column: 2;
+		}
+
+		.archive-project__meta {
+			grid-row: 1 / 3;
+		}
+
+		.work-index__note {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	@media (max-width: 600px) {
+		.work-index__hero {
+			min-height: 750px;
+		}
+
+		.work-index__meta span:last-child {
+			display: none;
+		}
+
+		.work-index h1 {
+			font-size: clamp(72px, 24vw, 130px);
+			line-height: 0.71;
+		}
+
+		.work-index h1 span:last-child {
+			margin-left: 0;
+			-webkit-text-stroke-width: 1px;
+		}
+
+		.work-index__intro {
+			display: block;
+		}
+
+		.work-index__intro p {
+			font-size: 12px;
+		}
+
+		.work-index__intro a {
+			display: inline-block;
+			margin-top: 25px;
+		}
+
+		.archive-project {
+			display: block;
+		}
+
+		.archive-project__meta {
+			flex-direction: row;
+			justify-content: space-between;
+			margin-bottom: 20px;
+		}
+
+		.archive-project__meta span:first-child {
+			margin: 0;
+		}
+
+		.archive-project__copy {
+			margin-top: 35px;
+		}
+
+		.archive-project__copy h2 {
+			font-size: 62px;
+		}
+
+		.archive-project__copy p {
+			margin-bottom: 30px;
+		}
+
+		.work-index__note > p {
+			font-size: 56px;
+		}
+	}
+</style>
