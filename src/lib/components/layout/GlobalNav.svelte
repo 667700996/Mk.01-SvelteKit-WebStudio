@@ -1,153 +1,318 @@
 <script lang="ts">
-	import { createEventDispatcher, onMount } from 'svelte';
-	import Magnetic from '$lib/components/motion/Magnetic.svelte';
 	import { page } from '$app/stores';
-	import { fly, fade, slide } from 'svelte/transition';
-	import { cubicOut } from 'svelte/easing';
 
-	export let theme: 'studio-light' | 'studio-dark' = 'studio-light';
-	const dispatch = createEventDispatcher<{ themeChange: 'studio-light' | 'studio-dark' }>();
-
-	const navLinks = [
-		{ href: '/', label: 'Home' },
-		{ href: '/work', label: 'Work' },
-		{ href: '/about', label: 'About' },
-		{ href: '/blog', label: 'Journal' }
+	const links = [
+		{ href: '/#work', label: 'Work' },
+		{ href: '/#lab', label: 'Lab' },
+		{ href: '/#method', label: 'Method' },
+		{ href: '/about', label: 'About' }
 	];
 
 	let mobileOpen = false;
-	let navElement: HTMLElement;
 	let y = 0;
 
-	$: isScrolled = y > 20;
+	$: isHome = $page.url.pathname === '/';
+	$: scrolled = y > 24;
 
-	function closeMobileMenu() {
+	function closeMenu() {
 		mobileOpen = false;
 	}
-
-	onMount(async () => {
-		if (navElement) {
-			const { animate } = await import('motion');
-			animate(
-				navElement,
-				{ y: [-50, 0], opacity: [0, 1] },
-				{ duration: 0.8, easing: [0.16, 1, 0.3, 1] }
-			);
-		}
-	});
 </script>
 
 <svelte:window bind:scrollY={y} />
 
-<div class="pointer-events-none fixed inset-x-0 top-0 z-50 flex justify-center pt-4 transition-all duration-500 ease-out"
-	class:pt-2={isScrolled}
->
-	<nav
-		bind:this={navElement}
-		class="pointer-events-auto relative flex items-center gap-2 rounded-full border border-base-content/5 p-1.5 shadow-sm backdrop-blur-md transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
-		class:bg-base-100-80={!isScrolled}
-		class:bg-base-100-95={isScrolled}
-		class:shadow-glow={!isScrolled}
-		class:shadow-lg={isScrolled}
-		style:width={isScrolled ? 'auto' : '100%'}
-		style:max-width={isScrolled ? 'fit-content' : '42rem'}
-		style:padding-left={isScrolled ? '0.75rem' : '0.5rem'}
-		style:padding-right={isScrolled ? '0.75rem' : '0.5rem'}
-	>
-		<!-- Logo -->
-		<a
-			href="/"
-			class="group flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-primary to-secondary text-primary-content shadow-inner transition-transform duration-300 hover:rotate-12"
-		>
-			<span class="font-display font-bold text-lg">M</span>
-		</a>
+<header class:scrolled class:home-nav={isHome} class="site-nav">
+	<a class="site-nav__brand" href="/" aria-label="Mk.01 home">
+		<span>MK.01</span>
+		<i>Creative technology</i>
+	</a>
 
-		<!-- Desktop Links -->
-		<div class="hidden items-center gap-1 px-2 md:flex">
-			{#each navLinks as link}
-				<Magnetic>
-					<a
-						href={link.href}
-						class="relative rounded-full px-4 py-2 text-sm font-medium transition-colors hover:bg-base-content/5 hover:text-primary {$page
-							.url.pathname === link.href
-							? 'text-primary'
-							: 'text-base-content/70'}"
-					>
-						{link.label}
-						{#if $page.url.pathname === link.href}
-							<div
-								in:fade={{ duration: 200 }}
-								class="absolute inset-0 -z-10 rounded-full bg-base-content/5"
-							></div>
-						{/if}
-					</a>
-				</Magnetic>
-			{/each}
-		</div>
-
-		<!-- Action & Theme -->
-		<div class="flex items-center gap-2 pl-2 border-l border-base-content/10 ml-1">
-			<a
-				href="/contact"
-				class="btn btn-circle btn-sm btn-ghost transition-all hover:bg-primary/10 hover:text-primary hidden sm:flex"
-				aria-label="Contact"
-			>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke-width="1.5"
-					stroke="currentColor"
-					class="h-5 w-5"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"
-					/>
-				</svg>
+	<nav class="site-nav__links" aria-label="Primary navigation">
+		{#each links as link}
+			<a href={link.href}>
+				<span>{link.label}</span>
 			</a>
-
-			<!-- Mobile Toggle -->
-			<button
-				class="btn btn-circle btn-sm btn-ghost md:hidden"
-				aria-label="Toggle menu"
-				on:click={() => (mobileOpen = !mobileOpen)}
-			>
-				<div class="flex flex-col gap-1">
-					<span class="block h-0.5 w-5 bg-current transition-transform" class:rotate-45={mobileOpen} class:translate-y-1.5={mobileOpen}></span>
-					<span class="block h-0.5 w-5 bg-current transition-opacity" class:opacity-0={mobileOpen}></span>
-					<span class="block h-0.5 w-5 bg-current transition-transform" class:rotate-45={mobileOpen} class:-translate-y-1.5={mobileOpen} class:-rotate-45={mobileOpen}></span>
-				</div>
-			</button>
-		</div>
+		{/each}
 	</nav>
-</div>
 
-<!-- Mobile Menu Overlay -->
-{#if mobileOpen}
-	<div
-		class="fixed inset-0 z-40 flex flex-col items-center justify-center gap-6 bg-base-100/95 backdrop-blur-2xl md:hidden"
-		transition:fade={{ duration: 200 }}
+	<a class="site-nav__contact" href="/#contact">
+		<span class="site-nav__status"></span>
+		Start a project
+	</a>
+
+	<button
+		class="site-nav__toggle"
+		type="button"
+		aria-label={mobileOpen ? 'Close navigation' : 'Open navigation'}
+		aria-expanded={mobileOpen}
+		on:click={() => (mobileOpen = !mobileOpen)}
 	>
-		<nav class="flex flex-col items-center gap-6">
-			{#each navLinks as link, i}
-				<a
-					href={link.href}
-					class="font-display text-4xl font-bold text-base-content hover:text-primary transition-colors"
-					in:fly={{ y: 20, delay: 100 + i * 50, duration: 400, easing: cubicOut }}
-					on:click={closeMobileMenu}
-				>
-					{link.label}
+		<span></span>
+		<span></span>
+	</button>
+</header>
+
+{#if mobileOpen}
+	<div class="mobile-nav">
+		<div class="mobile-nav__meta">
+			<span>Index / 2026</span>
+			<span>Seoul, KR</span>
+		</div>
+		<nav aria-label="Mobile navigation">
+			{#each links as link, index}
+				<a href={link.href} on:click={closeMenu}>
+					<small>0{index + 1}</small>
+					<span>{link.label}</span>
+					<i>↗</i>
 				</a>
 			{/each}
 		</nav>
-		
-		<div in:fly={{ y: 20, delay: 300, duration: 400 }} class="absolute bottom-12 flex flex-col items-center gap-4">
-			<a href="/contact" class="btn btn-primary btn-lg rounded-full px-12" on:click={closeMobileMenu}>
-				Start Project
-			</a>
-			<button class="btn btn-ghost btn-sm" on:click={closeMobileMenu}>Close</button>
-		</div>
+		<a class="mobile-nav__contact" href="/#contact" on:click={closeMenu}>
+			studio@mk1.dev
+			<span>Available Q4 / 26</span>
+		</a>
 	</div>
 {/if}
+
+<style>
+	.site-nav {
+		position: fixed;
+		inset: 0 0 auto;
+		z-index: 100;
+		display: grid;
+		grid-template-columns: 1fr auto 1fr;
+		align-items: center;
+		height: 70px;
+		padding: 0 clamp(18px, 3vw, 50px);
+		border-bottom: 1px solid transparent;
+		color: #f0f0e8;
+		transition:
+			height 400ms cubic-bezier(0.16, 1, 0.3, 1),
+			background 300ms ease,
+			border-color 300ms ease;
+	}
+
+	.site-nav.scrolled {
+		height: 58px;
+		border-color: rgba(240, 240, 232, 0.12);
+		background: rgba(8, 9, 7, 0.78);
+		backdrop-filter: blur(18px);
+	}
+
+	.site-nav__brand {
+		display: inline-flex;
+		width: fit-content;
+		align-items: baseline;
+		gap: 13px;
+		color: inherit;
+	}
+
+	.site-nav__brand span {
+		font-family: 'Syne', sans-serif;
+		font-size: 17px;
+		font-weight: 700;
+		letter-spacing: -0.055em;
+	}
+
+	.site-nav__brand i {
+		color: rgba(240, 240, 232, 0.42);
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 7px;
+		font-style: normal;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+	}
+
+	.site-nav__links {
+		display: flex;
+		align-items: center;
+		gap: 2px;
+	}
+
+	.site-nav__links a {
+		position: relative;
+		overflow: hidden;
+		padding: 8px 15px;
+		color: rgba(240, 240, 232, 0.7);
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 8px;
+		letter-spacing: 0.09em;
+		text-transform: uppercase;
+	}
+
+	.site-nav__links a::after {
+		position: absolute;
+		right: 15px;
+		bottom: 4px;
+		left: 15px;
+		height: 1px;
+		background: #d7ff55;
+		content: '';
+		transform: scaleX(0);
+		transform-origin: right;
+		transition: transform 350ms cubic-bezier(0.16, 1, 0.3, 1);
+	}
+
+	.site-nav__links a:hover {
+		color: #f0f0e8;
+	}
+
+	.site-nav__links a:hover::after {
+		transform: scaleX(1);
+		transform-origin: left;
+	}
+
+	.site-nav__contact {
+		display: inline-flex;
+		justify-self: end;
+		align-items: center;
+		gap: 9px;
+		color: #f0f0e8;
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 8px;
+		letter-spacing: 0.09em;
+		text-transform: uppercase;
+	}
+
+	.site-nav__status {
+		width: 6px;
+		height: 6px;
+		border-radius: 50%;
+		background: #d7ff55;
+		box-shadow: 0 0 12px rgba(215, 255, 85, 0.7);
+		animation: status 2.2s ease-in-out infinite;
+	}
+
+	@keyframes status {
+		50% {
+			opacity: 0.4;
+		}
+	}
+
+	.site-nav__toggle {
+		display: none;
+		width: 42px;
+		height: 42px;
+		align-items: center;
+		justify-content: center;
+		flex-direction: column;
+		gap: 5px;
+		border: 1px solid rgba(240, 240, 232, 0.18);
+		border-radius: 50%;
+		background: rgba(8, 9, 7, 0.4);
+		color: #f0f0e8;
+	}
+
+	.site-nav__toggle span {
+		width: 14px;
+		height: 1px;
+		background: currentColor;
+	}
+
+	.mobile-nav {
+		position: fixed;
+		inset: 0;
+		z-index: 90;
+		display: flex;
+		flex-direction: column;
+		padding: 100px 18px 24px;
+		background: #d7ff55;
+		color: #080907;
+		animation: menu-in 500ms cubic-bezier(0.76, 0, 0.24, 1);
+	}
+
+	@keyframes menu-in {
+		from {
+			clip-path: inset(0 0 100% 0);
+		}
+		to {
+			clip-path: inset(0);
+		}
+	}
+
+	.mobile-nav__meta {
+		display: flex;
+		justify-content: space-between;
+		border-top: 1px solid rgba(8, 9, 7, 0.3);
+		padding-top: 12px;
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 8px;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+	}
+
+	.mobile-nav nav {
+		margin-top: 11vh;
+	}
+
+	.mobile-nav nav a {
+		display: grid;
+		grid-template-columns: 34px 1fr auto;
+		align-items: center;
+		border-bottom: 1px solid rgba(8, 9, 7, 0.26);
+		padding: 12px 0 8px;
+		color: #080907;
+		font-family: 'Syne', sans-serif;
+		font-size: clamp(52px, 15vw, 78px);
+		font-weight: 600;
+		letter-spacing: -0.07em;
+		line-height: 0.9;
+	}
+
+	.mobile-nav nav small {
+		align-self: start;
+		padding-top: 5px;
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 8px;
+		letter-spacing: 0;
+	}
+
+	.mobile-nav nav i {
+		font-family: sans-serif;
+		font-size: 22px;
+		font-style: normal;
+		font-weight: 300;
+		letter-spacing: 0;
+	}
+
+	.mobile-nav__contact {
+		display: flex;
+		justify-content: space-between;
+		margin-top: auto;
+		border-top: 1px solid rgba(8, 9, 7, 0.3);
+		padding-top: 14px;
+		color: #080907;
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 9px;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+	}
+
+	@media (max-width: 760px) {
+		.site-nav {
+			height: 64px;
+			grid-template-columns: 1fr auto;
+			padding-inline: 17px;
+		}
+
+		.site-nav__brand i,
+		.site-nav__links,
+		.site-nav__contact {
+			display: none;
+		}
+
+		.site-nav__toggle {
+			display: flex;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.site-nav__status {
+			animation: none;
+		}
+
+		.mobile-nav {
+			animation: none;
+		}
+	}
+</style>
