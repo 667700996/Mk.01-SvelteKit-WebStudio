@@ -3,10 +3,11 @@ import { buildSeo } from "$lib/utils/seo";
 export const load = () => {
   return {
     seo: buildSeo({
-      title: "About the Mk.01 studio",
+      title: "Profile — Creative developer and designer",
       description:
-        "Meet Mk.01, a design-engineering lab crafting launch systems, design systems, and experimental web experiences for global teams.",
+        "The profile, principles, and working range behind MK.01 — a hybrid creative developer and designer based in Seoul.",
       path: "/about",
+      image: "/og.png",
     }),
   };
 };
