@@ -2,7 +2,7 @@
 	import PageSection from '$lib/components/ui/PageSection.svelte';
 	import ScrambleText from '$lib/components/motion/ScrambleText.svelte';
 	import { tilt } from '$lib/components/motion/tilt';
-	import { scale, fade } from 'svelte/transition';
+	import { scale } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
 
 	const projectTypes = [

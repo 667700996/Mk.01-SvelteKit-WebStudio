@@ -28,8 +28,8 @@
 </script>
 
 <header class="nav-shell">
-	<div class="nav-background" aria-hidden="true" />
-	<div class="nav-gradient" aria-hidden="true" />
+	<div class="nav-background" aria-hidden="true"></div>
+	<div class="nav-gradient" aria-hidden="true"></div>
 
 	<nav class="nav-container">
 		<a href="/" class="brand">
@@ -75,8 +75,8 @@
 			<button class="theme-button" type="button" on:click={cycleTheme}>
 				<span class="sr-only">Toggle theme</span>
 				<div class="theme-icon" aria-hidden="true">
-					<div />
-					<div />
+					<div></div>
+					<div></div>
 				</div>
 			</button>
 			<button class="command-button" type="button" on:click={openCommandPalette}>
@@ -92,8 +92,8 @@
 			>
 				<span class="sr-only">Toggle navigation</span>
 				<div class="menu-icon" aria-hidden="true">
-					<div class:open={mobileOpen} />
-					<div class:open={mobileOpen} />
+					<div class:open={mobileOpen}></div>
+					<div class:open={mobileOpen}></div>
 				</div>
 			</button>
 		</div>

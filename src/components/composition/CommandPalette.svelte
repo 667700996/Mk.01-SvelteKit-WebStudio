@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onDestroy, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 	import { derived } from 'svelte/store';
 	import { navigationConfig } from '$config/navigation.config';
 	import { experienceStore } from '$services/experience';

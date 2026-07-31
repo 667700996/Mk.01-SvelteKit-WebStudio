@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { spring } from 'svelte/motion';
 
 	let element: HTMLElement;

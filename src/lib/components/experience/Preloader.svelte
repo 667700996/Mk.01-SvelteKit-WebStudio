@@ -3,7 +3,6 @@
 	import { fade, fly } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
 	import { experienceStore } from '$services/experience';
-	import { get } from 'svelte/store';
 
 	export let loaded = false;
 

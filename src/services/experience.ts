@@ -35,7 +35,7 @@ function createExperienceStore(config: ExperienceConfig) {
       );
       try {
         localStorage.removeItem("mk01_experience");
-      } catch (e) {
+      } catch {
         // Ignore if we can't remove
       }
       return {};
@@ -57,7 +57,12 @@ function createExperienceStore(config: ExperienceConfig) {
   // Persist changes
   if (browser) {
     state.subscribe((value) => {
-      const { isCommandPaletteOpen, ...persistable } = value;
+      const persistable = {
+        theme: value.theme,
+        isAmbientAudioPlaying: value.isAmbientAudioPlaying,
+        isPerformanceMode: value.isPerformanceMode,
+        isDevMode: value.isDevMode,
+      };
       localStorage.setItem("mk01_experience", JSON.stringify(persistable));
 
       // Sync theme with DOM for immediate CSS effect

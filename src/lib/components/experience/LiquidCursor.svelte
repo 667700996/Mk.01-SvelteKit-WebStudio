@@ -17,9 +17,6 @@
 	let isClicking = false;
 	let isHidden = false; // New state for hiding cursor
 
-	// Reactive performance mode flag
-	$: $experienceStore.isPerformanceMode;
-
 	onMount(() => {
 		const onMouseMove = (e: MouseEvent) => {
 			coords.set({ x: e.clientX, y: e.clientY });

@@ -34,8 +34,7 @@ export const sampleProjects: WorkProject[] = [
     slug: "flowstate",
     title: "Mono/R",
     coverImage: "/images/work/flowstate-cover.jpg",
-    summary:
-      "An adaptive focus system where motion responds to human rhythm.",
+    summary: "An adaptive focus system where motion responds to human rhythm.",
     year: "2025",
     tags: ["Product Design", "Adaptive Motion", "Prototype"],
     industry: "Human Performance",

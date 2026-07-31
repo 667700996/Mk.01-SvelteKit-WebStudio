@@ -1,11 +1,9 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import PageSection from '$lib/components/ui/PageSection.svelte';
-	import Surface from '$components/ui/Surface.svelte';
 	import type { PageData } from './$types';
 
 	export let data: PageData;
-	const { experiment, relatedProject } = data;
+	const { experiment } = data;
 
 	// Mock "Tweakpane" controls for the lab
 	let controls = [

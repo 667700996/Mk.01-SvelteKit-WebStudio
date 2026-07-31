@@ -8,13 +8,17 @@
 	export let speed = 30; // ms per char update
 	
 	let display = text;
-	let interval: ReturnType<typeof setInterval>;
+	let interval: ReturnType<typeof setInterval> | undefined;
+	let iterations = 0;
+	let mounted = false;
 	const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}|;:,.<>?';
 
 	function scramble() {
+		if (interval) clearInterval(interval);
+		iterations = 0;
+
 		if (get(experienceStore).isPerformanceMode) {
 			display = text; // Show full text immediately
-			clearInterval(interval);
 			return;
 		}
 
@@ -37,11 +41,16 @@
 		}, speed);
 	}
 
-	$: if (active) scramble();
+	$: if (mounted && active) scramble();
 
 	// Auto-scramble on mount if no external trigger
 	onMount(() => {
+		mounted = true;
 		if (!active) scramble();
+
+		return () => {
+			if (interval) clearInterval(interval);
+		};
 	});
 </script>
 

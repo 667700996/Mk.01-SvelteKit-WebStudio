@@ -17,7 +17,7 @@
 		($page.data as { seo?: SeoResult })?.seo ?? buildSeo({ path: $page.url.pathname });
 	$: jsonLdMarkup =
 		currentSeo?.jsonLd != null
-			? `<script type="application/ld+json">${serializeJsonLd(currentSeo.jsonLd)}<\/script>`
+			? `<script type="application/ld+json">${serializeJsonLd(currentSeo.jsonLd)}</${'script'}>`
 			: '';
 </script>
 

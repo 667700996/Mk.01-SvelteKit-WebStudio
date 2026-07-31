@@ -46,7 +46,7 @@
 					{ 
 						duration: finalDuration, 
 						delay: (i) => finalDelay + i * finalStagger,
-						easing: finalEase as any
+						easing: finalEase
 					}
 				);
 			},

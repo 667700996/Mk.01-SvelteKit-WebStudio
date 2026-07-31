@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
+	import { onMount } from 'svelte';
 
 	export let accent = '#7cf7ff';
 	export let glow = '#ff6bcb';
@@ -89,12 +89,11 @@
 		raf = requestAnimationFrame(draw);
 
 		return () => {
+			cancelAnimationFrame(raf);
 			canvas?.removeEventListener('pointermove', onPointer);
 			window.removeEventListener('resize', resize);
 		};
 	});
-
-	onDestroy(() => cancelAnimationFrame(raf));
 </script>
 
 <canvas bind:this={canvas} class="lab-preview" aria-hidden="true"></canvas>

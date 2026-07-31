@@ -15,10 +15,11 @@ export const load: PageServerLoad = () => {
     projects: enrichedProjects,
     labs: labExperiments.slice(0, 3),
     seo: buildSeo({
-      title: "Mk.01 Work – Case studies and launch systems",
+      title: "Selected systems — Case studies",
       description:
-        "Case studies from Mk.01 Studio featuring product UX, immersive storytelling, and system-level launches.",
+        "Selected MK.01 case studies across spatial identity, product narrative, motion systems, and creative technology.",
       path: "/work",
+      image: "/og.png",
     }),
   };
 };

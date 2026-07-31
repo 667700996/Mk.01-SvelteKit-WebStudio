@@ -30,7 +30,7 @@
 		const finalOffset = presetConfig?.offset ?? offset;
 		const finalBlur = blur || presetConfig?.blur;
 
-		let animation: any;
+		let animation: Record<string, (number | string)[] | undefined>;
 
 		if (type === 'fade') {
 			animation = {
@@ -58,17 +58,17 @@
 
 		const stop = inView(
 			element,
-			({ target }) => {
+			(target) => {
 				animate(
 					target,
 					animation,
 					{
 						delay: finalDelay,
 						duration: finalDuration,
-						easing: finalEase as any
+						easing: finalEase
 					}
 				);
-				if (!once) return (leaveInfo) => animate(target, { opacity: 0 }, { duration: 0.25 });
+				if (!once) return () => animate(target, { opacity: 0 }, { duration: 0.25 });
 			},
 			{ amount: threshold }
 		);

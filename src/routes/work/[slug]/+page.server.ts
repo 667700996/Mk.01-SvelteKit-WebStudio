@@ -22,10 +22,10 @@ export const load: PageServerLoad = ({ params }) => {
     project: { ...project, content },
     related,
     seo: buildSeo({
-      title: `${project.title} – Mk.01 Case Study`,
+      title: `${project.title} — Case study`,
       description: project.summary,
       path: `/work/${project.slug}`,
-      image: project.coverImage,
+      image: "/og.png",
       type: "article",
       tags: project.tags,
     }),

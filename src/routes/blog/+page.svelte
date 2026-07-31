@@ -6,7 +6,7 @@
 
 	export let data: PageData;
 
-	const { posts, pageNumber, totalPages, searchTerm, categories, tags, categoryFilter, tagFilter } = data;
+	const { posts, pageNumber, totalPages, searchTerm, categories, categoryFilter, tagFilter } = data;
 	let search = searchTerm;
 	let selectedCategory = categoryFilter;
 	

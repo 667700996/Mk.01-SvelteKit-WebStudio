@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { onDestroy, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 	import { experienceStore } from '$services/experience';
-	import { derived } from 'svelte/store';
+	import { derived, get } from 'svelte/store';
 
 	const isPlayingStore = derived(experienceStore, ($experience) => $experience.isAmbientAudioPlaying);
 	const isPerformanceMode = derived(experienceStore, ($experience) => $experience.isPerformanceMode);

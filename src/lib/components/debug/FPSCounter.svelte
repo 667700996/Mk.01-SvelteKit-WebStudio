@@ -2,21 +2,25 @@
 	import { onMount } from 'svelte';
 
 	export let fps = 0;
-	let lastFrameTime = performance.now();
+	let lastFrameTime = 0;
 	let frameCount = 0;
+	let frame = 0;
 
-	function animate(currentTime: DOMHighResTimeStamp) {
+	function animate(currentTime: number) {
 		frameCount++;
 		if (currentTime > lastFrameTime + 1000) {
 			fps = Math.round(frameCount * 1000 / (currentTime - lastFrameTime));
 			lastFrameTime = currentTime;
 			frameCount = 0;
 		}
-		requestAnimationFrame(animate);
+		frame = requestAnimationFrame(animate);
 	}
 
 	onMount(() => {
-		requestAnimationFrame(animate);
+		lastFrameTime = performance.now();
+		frame = requestAnimationFrame(animate);
+
+		return () => cancelAnimationFrame(frame);
 	});
 </script>
 

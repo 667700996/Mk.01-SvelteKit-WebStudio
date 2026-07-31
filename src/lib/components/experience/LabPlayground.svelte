@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import { onDestroy, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 
 	let canvas: HTMLCanvasElement;
 	let gl: WebGLRenderingContext | null = null;

@@ -1,0 +1,11 @@
+{
+  "overrides": [
+    {
+      "files": "src/styles/home.css",
+      "options": {
+        "singleQuote": true,
+        "useTabs": true
+      }
+    }
+  ]
+}

@@ -145,7 +145,11 @@ body.mk-home-active {
 	inset: 0;
 	z-index: -3;
 	background:
-		radial-gradient(circle at 72% 44%, rgba(181, 235, 69, 0.09), transparent 28%),
+		radial-gradient(
+			circle at 72% 44%,
+			rgba(181, 235, 69, 0.09),
+			transparent 28%
+		),
 		linear-gradient(180deg, #0b0c09 0%, var(--mk-ink) 82%);
 	content: '';
 }
@@ -411,7 +415,10 @@ body.mk-home-active {
 
 .work__header {
 	display: grid;
-	grid-template-columns: minmax(240px, 0.55fr) minmax(0, 1.25fr) minmax(220px, 0.45fr);
+	grid-template-columns: minmax(240px, 0.55fr) minmax(0, 1.25fr) minmax(
+			220px,
+			0.45fr
+		);
 	gap: 40px;
 	align-items: end;
 	margin-bottom: clamp(90px, 12vw, 170px);
@@ -564,8 +571,7 @@ body.mk-home-active {
 .project-art--signal {
 	background:
 		linear-gradient(90deg, rgba(215, 255, 85, 0.03) 1px, transparent 1px),
-		linear-gradient(rgba(215, 255, 85, 0.03) 1px, transparent 1px),
-		#060706;
+		linear-gradient(rgba(215, 255, 85, 0.03) 1px, transparent 1px), #060706;
 	background-size: 5% 5%;
 }
 

@@ -40,6 +40,7 @@
 	const view = presentation[project.slug] ?? presentation['neon-metropolis'];
 	const kpis = content.kpis ?? [];
 	const nextProject = data.related[0];
+	const systemCells = Array.from({ length: 48 }, (_, index) => index);
 
 	let ready = false;
 
@@ -177,8 +178,8 @@
 
 	<section class="case-system" data-case-reveal>
 		<div class="case-system__grid" aria-hidden="true">
-			{#each Array(48) as _, index}
-				<i style:opacity={(index % 7) / 8 + 0.12}></i>
+			{#each systemCells as cell}
+				<i style:opacity={(cell % 7) / 8 + 0.12}></i>
 			{/each}
 		</div>
 		<div class="case-system__copy">
@@ -230,7 +231,7 @@
 			transform 1s cubic-bezier(0.16, 1, 0.3, 1);
 	}
 
-	[data-case-reveal].is-visible {
+	:global([data-case-reveal].is-visible) {
 		opacity: 1;
 		transform: none;
 	}

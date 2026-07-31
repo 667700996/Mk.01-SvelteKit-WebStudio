@@ -65,7 +65,7 @@ async function resolveModules(
   const posts = await Promise.all(
     Object.entries(modules).map(async ([path, resolver]) => {
       const mod = await resolver();
-      const { metadata, default: component } = mod;
+      const { metadata } = mod;
 
       const slug = path.split("/").pop()?.replace(extension, "") ?? "";
       const rendered = renderContent(mod);

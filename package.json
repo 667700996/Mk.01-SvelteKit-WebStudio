@@ -7,7 +7,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "playwright test",
-    "lint": "prettier --check . && eslint .",
+    "lint": "prettier --check . && eslint --ext .ts,.svelte .",
     "format": "prettier --write ."
   },
   "devDependencies": {

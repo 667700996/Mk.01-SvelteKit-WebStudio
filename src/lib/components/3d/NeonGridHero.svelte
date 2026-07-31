@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import { onDestroy, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 	import * as THREE from 'three';
-	import { pointer, viewport, quality } from '$lib/stores/interaction';
+	import { pointer, viewport } from '$lib/stores/interaction';
 	import { get } from 'svelte/store';
 	import { experienceStore } from '$services/experience';
 
