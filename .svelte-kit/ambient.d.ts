@@ -56,6 +56,7 @@ declare module '$env/static/private' {
 	export const npm_execpath: string;
 	export const PAGER: string;
 	export const PATH: string;
+	export const CODEX_SANDBOX: string;
 	export const npm_package_json: string;
 	export const _: string;
 	export const npm_config_userconfig: string;
@@ -153,6 +154,7 @@ declare module '$env/dynamic/private' {
 		npm_execpath: string;
 		PAGER: string;
 		PATH: string;
+		CODEX_SANDBOX: string;
 		npm_package_json: string;
 		_: string;
 		npm_config_userconfig: string;
