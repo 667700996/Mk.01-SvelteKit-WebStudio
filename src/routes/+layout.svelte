@@ -8,16 +8,13 @@
 	import { buildSeo, type SeoResult } from '$lib/utils/seo';
 	import { page } from '$app/stores';
 
-	export let data: {
-		seo?: SeoResult;
-	};
-
 	function serializeJsonLd(payload: Record<string, unknown> | null) {
 		if (!payload) return '';
 		return JSON.stringify(payload).replace(/</g, '\\u003C');
 	}
 
-	$: currentSeo = data?.seo ?? buildSeo({ path: $page.url.pathname });
+	$: currentSeo =
+		($page.data as { seo?: SeoResult })?.seo ?? buildSeo({ path: $page.url.pathname });
 	$: jsonLdMarkup =
 		currentSeo?.jsonLd != null
 			? `<script type="application/ld+json">${serializeJsonLd(currentSeo.jsonLd)}<\/script>`
