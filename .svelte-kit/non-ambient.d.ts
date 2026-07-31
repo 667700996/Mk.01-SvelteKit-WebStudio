@@ -57,6 +57,6 @@ declare module "$app/types" {
 		};
 		Pathname(): "/" | "/about" | "/about/" | "/blog" | "/blog/" | "/blog/category" | "/blog/category/" | `/blog/category/${string}` & {} | `/blog/category/${string}/` & {} | `/blog/${string}` & {} | `/blog/${string}/` & {} | "/capabilities" | "/capabilities/" | "/contact" | "/contact/" | "/labs" | "/labs/" | `/labs/${string}` & {} | `/labs/${string}/` & {} | "/open-source" | "/open-source/" | "/portfolio" | "/portfolio/" | "/privacy" | "/privacy/" | "/services" | "/services/" | "/stack" | "/stack/" | "/team" | "/team/" | "/terms" | "/terms/" | "/work" | "/work/" | `/work/${string}` & {} | `/work/${string}/` & {};
 		ResolvedPathname(): `${"" | `/${string}`}${ReturnType<AppTypes['Pathname']>}`;
-		Asset(): "/favicon.ico" | "/noise.png" | string & {};
+		Asset(): "/favicon.ico" | "/noise.png" | "/og.png" | string & {};
 	}
 }
