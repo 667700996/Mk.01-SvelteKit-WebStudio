@@ -10,7 +10,7 @@
 <footer class="site-footer">
 	<div class="site-footer__top">
 		<a href="/" class="site-footer__brand">MK.01</a>
-		<p>Independent creative technology studio.<br />Seoul / Everywhere.</p>
+		<p>Independent design engineering practice.<br />Seoul / Global.</p>
 	</div>
 	<div class="site-footer__bottom">
 		<nav aria-label="Footer navigation">

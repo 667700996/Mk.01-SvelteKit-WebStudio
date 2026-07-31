@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import SignalArtifact from '$lib/components/3d/SignalArtifact.svelte';
 	import FieldConsole from '$lib/components/experience/FieldConsole.svelte';
+	import SystemLedger from '$lib/components/experience/SystemLedger.svelte';
 	import '../styles/home.css';
 
 	const projects = [
@@ -60,7 +61,6 @@
 		}
 	];
 
-	let introVisible = true;
 	let activeProject = 0;
 	let currentTime = '';
 
@@ -78,9 +78,6 @@
 		};
 		formatTime();
 		const clockTimer = window.setInterval(formatTime, 1000);
-		const introTimer = window.setTimeout(() => {
-			introVisible = false;
-		}, 1900);
 
 		const revealObserver = new IntersectionObserver(
 			(entries) => {
@@ -113,7 +110,6 @@
 		return () => {
 			document.body.classList.remove('mk-home-active');
 			window.clearInterval(clockTimer);
-			window.clearTimeout(introTimer);
 			revealObserver.disconnect();
 			projectObserver.disconnect();
 		};
@@ -124,17 +120,6 @@
 	<meta name="theme-color" content="#080907" />
 </svelte:head>
 
-{#if introVisible}
-	<div class="intro" aria-hidden="true">
-		<div class="intro__mark">MK.01</div>
-		<div class="intro__status">
-			<span>Calibrating digital matter</span>
-			<span>2026</span>
-		</div>
-		<div class="intro__track"><span></span></div>
-	</div>
-{/if}
-
 <article class="home">
 	<section class="hero" aria-labelledby="hero-title">
 		<div class="hero__grid" aria-hidden="true"></div>
@@ -143,12 +128,12 @@
 		</div>
 
 		<div class="hero__meta hero__meta--left">
-			<span>Independent creative technology studio</span>
-			<span>Seoul / Everywhere</span>
+			<span>Creative technologist × product engineer</span>
+			<span>Seoul / Global</span>
 		</div>
 		<div class="hero__meta hero__meta--right">
-			<span>Art direction × Engineering</span>
-			<span>Selected signal / 2026</span>
+			<span>Portfolio / Selected systems</span>
+			<span>Design × Motion × Code</span>
 		</div>
 
 		<div class="hero__headline">
@@ -162,8 +147,8 @@
 
 		<div class="hero__footer">
 			<p>
-				Mk.01 creates digital flagships and interactive systems for ambitious brands operating at
-				the edge of culture and technology.
+				MK.01 is the practice of a design engineer building digital products, identities, and
+				interactive systems where concept and code become one material.
 			</p>
 			<a class="text-link" href="#work">Explore selected work <span>↓</span></a>
 		</div>
@@ -186,11 +171,11 @@
 			</h2>
 			<div class="manifesto__support">
 				<p>
-					We combine strategy, design, motion, and engineering into one continuous practice. No
-					handoff gaps. No decorative movement. Every frame has a job.
+					Strategy, interface, motion, and engineering are treated as one continuous practice.
+					Every behavior earns its place; every frame has a job.
 				</p>
 				<p class="mono-copy">
-					Our work is built to earn attention,<br />
+					The work must earn attention,<br />
 					reward curiosity, and survive reality.
 				</p>
 			</div>
@@ -298,10 +283,12 @@
 		</div>
 	</section>
 
+	<SystemLedger />
+
 	<section class="method section-pad" id="method" aria-labelledby="method-title">
 		<div class="method__intro" data-reveal>
 			<div class="section-index">
-				<span>( 05 )</span>
+				<span>( 06 )</span>
 				<span>One continuous practice</span>
 			</div>
 			<h2 id="method-title">Thinking and making<br />belong in the same room.</h2>
@@ -330,13 +317,13 @@
 	<section class="contact" id="contact" aria-labelledby="contact-title">
 		<div class="contact__noise" aria-hidden="true"></div>
 		<div class="contact__meta">
-			<span>Have something ambitious in mind?</span>
-			<span>Available for selected commissions / Q4 2026</span>
+			<span>Building something that should feel inevitable?</span>
+			<span>Open to exceptional teams and selected commissions / 2026</span>
 		</div>
 		<h2 id="contact-title">
 			<a href="mailto:studio@mk1.dev?subject=New%20project%20with%20Mk.01">
 				<span>Make it</span>
-				<span>impossible.</span>
+				<span>matter.</span>
 				<i aria-hidden="true">↗</i>
 			</a>
 		</h2>

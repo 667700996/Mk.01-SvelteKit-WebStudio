@@ -35,24 +35,14 @@ export interface AppConfig {
 
 export const appConfig: AppConfig = {
   identity: {
-    name: "Mk.01 SvelteKit Studio",
-    tagline:
-      "Universal web experiences that launch, convert, and linger in memory.",
+    name: "MK.01",
+    tagline: "Digital matter, engineered.",
     description:
-      "Mk.01 is a strategy-led design engineering studio crafting digital flagships, campaign landers, and speculative labs. We fuse narrative, performance, and inclusive craft to ship experiences people remember.",
+      "The independent practice of a creative technologist and product engineer building expressive, resilient digital systems.",
     primaryLocale: "en",
     locales: ["en", "ko"],
     contactEmail: "studio@mk1.dev",
-    socials: [
-      {
-        label: "GitHub",
-        url: "https://github.com/your-handle",
-        handle: "@mk1-studio",
-      },
-      { label: "Dribbble", url: "https://dribbble.com/your-handle" },
-      { label: "Behance", url: "https://behance.net/your-handle" },
-      { label: "LinkedIn", url: "https://linkedin.com/in/your-handle" },
-    ],
+    socials: [],
   },
   metrics: {
     experimentsShipped: "48+",

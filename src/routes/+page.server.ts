@@ -5,9 +5,9 @@ import { buildSeo } from "$lib/utils/seo";
 export const load: PageServerLoad = async () => {
   return {
     seo: buildSeo({
-      title: "Digital matter, engineered",
+      title: "Creative Technologist & Product Engineer",
       description:
-        "Mk.01 is an independent creative technology studio crafting digital flagships, interactive systems, and WebGL experiences for ambitious brands.",
+        "MK.01 is a design engineering portfolio for expressive digital products, interactive systems, WebGL, and motion built with production-grade rigor.",
       path: "/",
       image: "/og.png",
     }),

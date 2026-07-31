@@ -10,6 +10,8 @@
 
 	let query = '';
 	let inputElement: HTMLInputElement | null = null;
+	let activeIndex = 0;
+	let previousActiveElement: HTMLElement | null = null;
 
 	const isOpen = derived(experienceStore, ($experience) => $experience.isCommandPaletteOpen);
 
@@ -73,10 +75,24 @@
 	}
 
 	$: filteredActions = rankActions(query);
+	$: if (query) activeIndex = 0;
+
+	function activateAction(index: number) {
+		const action = filteredActions[index];
+		if (!action) return;
+
+		if (action.action) action.action();
+		else if (action.href && action.href !== '#') window.location.assign(action.href);
+		closePalette();
+	}
 
 	function closePalette() {
+		const focusTarget = previousActiveElement;
+		previousActiveElement = null;
 		experienceStore.closeCommandPalette();
 		query = '';
+		activeIndex = 0;
+		requestAnimationFrame(() => focusTarget?.focus());
 	}
 
 	function handleKeydown(event: KeyboardEvent) {
@@ -90,7 +106,11 @@
 				experienceStore.toggleAmbientAudio();
 				return;
 			}
-			experienceStore.openCommandPalette();
+			if ($isOpen) closePalette();
+			else {
+				previousActiveElement = document.activeElement as HTMLElement | null;
+				experienceStore.openCommandPalette();
+			}
 		}
 
 		if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'p') {
@@ -103,15 +123,42 @@
 		if (event.key === 'Escape') {
 			closePalette();
 		}
+
+		if (!$isOpen || filteredActions.length === 0) return;
+
+		if (event.key === 'ArrowDown') {
+			event.preventDefault();
+			activeIndex = (activeIndex + 1) % filteredActions.length;
+		}
+
+		if (event.key === 'ArrowUp') {
+			event.preventDefault();
+			activeIndex = (activeIndex - 1 + filteredActions.length) % filteredActions.length;
+		}
+
+		if (event.key === 'Enter' && document.activeElement === inputElement) {
+			event.preventDefault();
+			activateAction(activeIndex);
+		}
 	}
 
 	let focusFrame: number | null = null;
 
 	onMount(() => {
 		window.addEventListener('keydown', handleKeydown);
+		const unsubscribe = isOpen.subscribe((open) => {
+			if (open) {
+				previousActiveElement ??= document.activeElement as HTMLElement | null;
+				document.body.style.overflow = 'hidden';
+			} else {
+				document.body.style.removeProperty('overflow');
+			}
+		});
 
 		return () => {
 			window.removeEventListener('keydown', handleKeydown);
+			unsubscribe();
+			document.body.style.removeProperty('overflow');
 			if (focusFrame !== null) {
 				cancelAnimationFrame(focusFrame);
 				focusFrame = null;
@@ -132,7 +179,12 @@
 </script>
 
 {#if $isOpen}
-	<div class="fixed inset-0 z-[200] grid place-items-center p-4" role="dialog" aria-modal="true">
+	<div
+		class="fixed inset-0 z-[200] grid place-items-center p-4"
+		role="dialog"
+		aria-modal="true"
+		aria-labelledby="command-title"
+	>
 		<!-- Backdrop -->
 		<button 
 			type="button" 
@@ -143,16 +195,22 @@
 
 		<!-- Palette -->
 		<div class="relative z-10 w-full max-w-2xl overflow-hidden rounded-2xl border border-base-content/10 bg-base-100/95 shadow-2xl backdrop-blur-xl ring-1 ring-base-content/5">
+			<h2 id="command-title" class="sr-only">Site index and command palette</h2>
 			
 			<!-- Header -->
 			<header class="border-b border-base-content/10 p-3">
 				<div class="relative flex items-center">
-					<svg class="pointer-events-none absolute left-4 h-5 w-5 text-base-content/50" viewBox="0 0 20 20" fill="currentColor">
-						<path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
-					</svg>
+					<span class="search-symbol" aria-hidden="true"></span>
 					<input
 						bind:this={inputElement}
 						type="text"
+						role="combobox"
+						aria-autocomplete="list"
+						aria-controls="command-results"
+						aria-expanded="true"
+						aria-activedescendant={filteredActions[activeIndex]
+							? `command-option-${activeIndex}`
+							: undefined}
 						class="h-12 w-full bg-transparent pl-11 pr-4 text-base text-base-content placeholder-base-content/40 focus:outline-none"
 						placeholder="Search actions, pages, or ideas…"
 						bind:value={query}
@@ -177,9 +235,13 @@
 						<p class="mt-1 text-xs opacity-70">Try searching for 'Work', 'Labs', or 'About'.</p>
 					</div>
 				{:else}
-					<ul class="space-y-1">
+					<ul class="space-y-1" id="command-results" role="listbox">
 						{#each filteredActions as action, index (action.href + index)}
-							<li>
+							<li
+								id="command-option-{index}"
+								role="option"
+								aria-selected={activeIndex === index}
+							>
 								<a 
 									href={action.href !== '#' ? action.href : undefined} 
 									on:click={(e) => {
@@ -189,7 +251,9 @@
 										}
 										closePalette();
 									}}
-									class="group flex items-center justify-between rounded-lg px-4 py-3 transition-colors hover:bg-base-content/5 focus:bg-base-content/5 focus:outline-none"
+									on:mouseenter={() => (activeIndex = index)}
+									class:active-result={activeIndex === index}
+									class="command-result group flex items-center justify-between rounded-lg px-4 py-3 transition-colors hover:bg-base-content/5 focus:bg-base-content/5 focus:outline-none"
 								>
 									<div class="flex flex-col gap-0.5">
 										<div class="flex items-center gap-2">
@@ -242,3 +306,32 @@
 		</div>
 	</div>
 {/if}
+
+<style>
+	.search-symbol {
+		position: absolute;
+		left: 1rem;
+		width: 0.9rem;
+		height: 0.9rem;
+		border: 1.5px solid currentColor;
+		border-radius: 50%;
+		color: color-mix(in oklab, currentColor 52%, transparent);
+		pointer-events: none;
+	}
+
+	.search-symbol::after {
+		position: absolute;
+		right: -0.28rem;
+		bottom: -0.2rem;
+		width: 0.42rem;
+		height: 1.5px;
+		background: currentColor;
+		content: '';
+		transform: rotate(45deg);
+		transform-origin: left;
+	}
+
+	.command-result.active-result {
+		background: color-mix(in oklab, currentColor 6%, transparent);
+	}
+</style>

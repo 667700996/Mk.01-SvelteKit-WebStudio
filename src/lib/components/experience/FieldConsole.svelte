@@ -45,6 +45,9 @@
 			setEngaged(false);
 		};
 
+		const engagePointer = () => setEngaged(true);
+		const disengagePointer = () => setEngaged(false);
+
 		const render = () => {
 			if (!inView) return;
 			time += reduceMotion ? 0 : 0.012;
@@ -133,8 +136,8 @@
 		viewObserver.observe(canvas);
 		canvas.addEventListener('pointermove', updatePointer);
 		canvas.addEventListener('pointerleave', releasePointer);
-		canvas.addEventListener('pointerdown', () => setEngaged(true));
-		window.addEventListener('pointerup', () => setEngaged(false));
+		canvas.addEventListener('pointerdown', engagePointer);
+		window.addEventListener('pointerup', disengagePointer);
 		resize();
 		render();
 
@@ -144,6 +147,8 @@
 			viewObserver.disconnect();
 			canvas.removeEventListener('pointermove', updatePointer);
 			canvas.removeEventListener('pointerleave', releasePointer);
+			canvas.removeEventListener('pointerdown', engagePointer);
+			window.removeEventListener('pointerup', disengagePointer);
 		};
 	});
 </script>

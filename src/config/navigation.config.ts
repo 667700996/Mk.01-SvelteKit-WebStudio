@@ -95,19 +95,6 @@ export const navigationConfig: NavigationConfig = {
         { label: "Contact us", href: "/contact", accent: "primary" },
       ],
     },
-    {
-      title: "Quick Actions",
-      actions: [
-        { label: "Toggle theme", href: "#theme", icon: "sun-moon" },
-        { label: "Play ambient audio", href: "#audio", icon: "waveform" },
-        {
-          label: "Download deck",
-          href: "/deck.pdf",
-          icon: "download",
-          accent: "secondary",
-        },
-      ],
-    },
   ],
   footer: [
     {
@@ -125,7 +112,6 @@ export const navigationConfig: NavigationConfig = {
       items: [
         { label: "Privacy", href: "/privacy" },
         { label: "Terms", href: "/terms" },
-        { label: "Imprint", href: "/imprint" },
       ],
     },
   ],

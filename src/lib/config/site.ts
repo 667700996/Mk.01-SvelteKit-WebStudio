@@ -1,19 +1,21 @@
 export const siteConfig = {
-  name: "MK.01 — Creative Technology Studio",
+  name: "MK.01 — Creative Technologist & Product Engineer",
   shortName: "MK.01",
   description:
-    "An independent creative technology studio building digital flagships, interactive systems, and WebGL experiences.",
+    "A design engineering portfolio exploring digital products, interactive systems, WebGL, and motion with production-grade rigor.",
   url: {
     origin: "https://mk1.studio",
     basePath: "",
   },
   keywords: [
-    "creative technology studio",
+    "creative technologist",
+    "design engineer",
+    "product engineer",
     "interactive design",
-    "WebGL studio",
+    "WebGL",
     "SvelteKit",
-    "creative technology",
-    "digital storytelling",
+    "motion systems",
+    "digital product design",
   ],
   social: {
     twitter: "mk1studio",

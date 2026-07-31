@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import * as THREE from 'three';
 
 	let host: HTMLDivElement;
 
@@ -63,11 +62,15 @@
 	`;
 
 	onMount(() => {
-		if (!host || !window.WebGLRenderingContext) return;
+		let cancelled = false;
+		let disposeScene = () => {};
 
-		const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-		const compact = window.matchMedia('(max-width: 700px)').matches;
-		const renderer = new THREE.WebGLRenderer({
+		void import('three').then((THREE) => {
+			if (cancelled || !host || !window.WebGLRenderingContext) return;
+
+			const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+			const compact = window.matchMedia('(max-width: 700px)').matches;
+			const renderer = new THREE.WebGLRenderer({
 			alpha: true,
 			antialias: !compact,
 			powerPreference: 'high-performance'
@@ -152,10 +155,11 @@
 		const pointer = new THREE.Vector2(0, 0);
 		const pointerTarget = new THREE.Vector2(0, 0);
 		let scrollTarget = 0;
-		let scrollCurrent = 0;
-		let frame = 0;
-		let visible = true;
-		const clock = new THREE.Clock();
+			let scrollCurrent = 0;
+			let frame = 0;
+			let visible = true;
+			let inView = true;
+			const clock = new THREE.Clock();
 
 		const resize = () => {
 			const width = host.clientWidth;
@@ -175,16 +179,17 @@
 			scrollTarget = Math.min(window.scrollY / Math.max(window.innerHeight, 1), 1.2);
 		};
 
-		const onVisibility = () => {
-			visible = !document.hidden;
-			if (visible && !reduceMotion) {
-				clock.getDelta();
-				frame = requestAnimationFrame(render);
-			}
-		};
+			const onVisibility = () => {
+				visible = !document.hidden;
+				cancelAnimationFrame(frame);
+				if (visible && inView && !reduceMotion) {
+					clock.getDelta();
+					frame = requestAnimationFrame(render);
+				}
+			};
 
-		const render = () => {
-			if (!visible) return;
+			const render = () => {
+				if (!visible || !inView) return;
 			const elapsed = clock.getElapsedTime();
 			pointer.lerp(pointerTarget, 0.045);
 			scrollCurrent += (scrollTarget - scrollCurrent) * 0.055;
@@ -205,18 +210,33 @@
 			if (!reduceMotion) frame = requestAnimationFrame(render);
 		};
 
-		const resizeObserver = new ResizeObserver(resize);
-		resizeObserver.observe(host);
-		window.addEventListener('pointermove', onPointerMove, { passive: true });
+			const resizeObserver = new ResizeObserver(resize);
+			resizeObserver.observe(host);
+			const viewObserver = new IntersectionObserver(
+				(entries) => {
+					const next = entries[0]?.isIntersecting ?? false;
+					if (next === inView) return;
+					inView = next;
+					cancelAnimationFrame(frame);
+					if (inView && visible && !reduceMotion) {
+						clock.getDelta();
+						frame = requestAnimationFrame(render);
+					}
+				},
+				{ rootMargin: '120px' }
+			);
+			viewObserver.observe(host);
+			window.addEventListener('pointermove', onPointerMove, { passive: true });
 		window.addEventListener('scroll', onScroll, { passive: true });
 		document.addEventListener('visibilitychange', onVisibility);
 		resize();
 		onScroll();
 		render();
 
-		return () => {
-			cancelAnimationFrame(frame);
-			resizeObserver.disconnect();
+			disposeScene = () => {
+				cancelAnimationFrame(frame);
+				resizeObserver.disconnect();
+				viewObserver.disconnect();
 			window.removeEventListener('pointermove', onPointerMove);
 			window.removeEventListener('scroll', onScroll);
 			document.removeEventListener('visibilitychange', onVisibility);
@@ -230,9 +250,15 @@
 			renderer.dispose();
 			renderer.forceContextLoss();
 			renderer.domElement.remove();
+			};
+		});
+
+		return () => {
+			cancelled = true;
+			disposeScene();
 		};
 	});
-</script>
+	</script>
 
 <div class="artifact" bind:this={host} aria-hidden="true"></div>
 

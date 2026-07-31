@@ -1,11 +1,14 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
+	import { experienceStore } from '$services/experience';
 
 	const links = [
 		{ href: '/#work', label: 'Work' },
-		{ href: '/#lab', label: 'Lab' },
+		{ href: '/#lab', label: 'R&D' },
+		{ href: '/#engineering', label: 'Engineering' },
 		{ href: '/#method', label: 'Method' },
-		{ href: '/about', label: 'About' }
+		{ href: '/about', label: 'Profile' }
 	];
 
 	let mobileOpen = false;
@@ -16,6 +19,29 @@
 
 	function closeMenu() {
 		mobileOpen = false;
+		document.body.style.removeProperty('overflow');
+	}
+
+	function toggleMenu() {
+		mobileOpen = !mobileOpen;
+		document.body.style.overflow = mobileOpen ? 'hidden' : '';
+	}
+
+	onMount(() => {
+		const handleKeydown = (event: KeyboardEvent) => {
+			if (event.key === 'Escape' && mobileOpen) closeMenu();
+		};
+
+		window.addEventListener('keydown', handleKeydown);
+		return () => {
+			window.removeEventListener('keydown', handleKeydown);
+			document.body.style.removeProperty('overflow');
+		};
+	});
+
+	function openCommandPalette() {
+		closeMenu();
+		experienceStore.openCommandPalette();
 	}
 </script>
 
@@ -35,17 +61,24 @@
 		{/each}
 	</nav>
 
-	<a class="site-nav__contact" href="/#contact">
-		<span class="site-nav__status"></span>
-		Start a project
-	</a>
+	<div class="site-nav__actions">
+		<button class="site-nav__command" type="button" on:click={openCommandPalette}>
+			<span>Index</span>
+			<kbd>⌘K</kbd>
+		</button>
+		<a class="site-nav__contact" href="/#contact">
+			<span class="site-nav__status"></span>
+			Start a conversation
+		</a>
+	</div>
 
 	<button
 		class="site-nav__toggle"
 		type="button"
 		aria-label={mobileOpen ? 'Close navigation' : 'Open navigation'}
 		aria-expanded={mobileOpen}
-		on:click={() => (mobileOpen = !mobileOpen)}
+		aria-controls="mobile-navigation"
+		on:click={toggleMenu}
 	>
 		<span></span>
 		<span></span>
@@ -53,7 +86,7 @@
 </header>
 
 {#if mobileOpen}
-	<div class="mobile-nav">
+	<div class="mobile-nav" id="mobile-navigation">
 		<div class="mobile-nav__meta">
 			<span>Index / 2026</span>
 			<span>Seoul, KR</span>
@@ -67,10 +100,13 @@
 				</a>
 			{/each}
 		</nav>
-		<a class="mobile-nav__contact" href="/#contact" on:click={closeMenu}>
-			studio@mk1.dev
-			<span>Available Q4 / 26</span>
-		</a>
+		<div class="mobile-nav__footer">
+			<button type="button" on:click={openCommandPalette}>Open index <kbd>⌘K</kbd></button>
+			<a class="mobile-nav__contact" href="/#contact" on:click={closeMenu}>
+				studio@mk1.dev
+				<span>Open to conversations / 26</span>
+			</a>
+		</div>
 	</div>
 {/if}
 
@@ -160,6 +196,41 @@
 	.site-nav__links a:hover::after {
 		transform: scaleX(1);
 		transform-origin: left;
+	}
+
+	.site-nav__actions {
+		display: flex;
+		justify-self: end;
+		align-items: center;
+		gap: 22px;
+	}
+
+	.site-nav__command {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		border: 0;
+		padding: 7px 0;
+		background: transparent;
+		color: rgba(240, 240, 232, 0.48);
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 8px;
+		letter-spacing: 0.09em;
+		text-transform: uppercase;
+		transition: color 200ms ease;
+		cursor: pointer;
+	}
+
+	.site-nav__command:hover {
+		color: #f0f0e8;
+	}
+
+	.site-nav__command kbd {
+		border: 1px solid rgba(240, 240, 232, 0.18);
+		border-radius: 3px;
+		padding: 2px 4px;
+		font: inherit;
+		letter-spacing: 0;
 	}
 
 	.site-nav__contact {
@@ -288,6 +359,31 @@
 		text-transform: uppercase;
 	}
 
+	.mobile-nav__footer {
+		margin-top: auto;
+	}
+
+	.mobile-nav__footer > button {
+		display: flex;
+		width: 100%;
+		justify-content: space-between;
+		margin-bottom: 18px;
+		border: 0;
+		border-top: 1px solid rgba(8, 9, 7, 0.3);
+		border-bottom: 1px solid rgba(8, 9, 7, 0.3);
+		padding: 13px 0;
+		background: transparent;
+		color: #080907;
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 9px;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+	}
+
+	.mobile-nav__footer kbd {
+		font: inherit;
+	}
+
 	@media (max-width: 760px) {
 		.site-nav {
 			height: 64px;
@@ -297,7 +393,7 @@
 
 		.site-nav__brand i,
 		.site-nav__links,
-		.site-nav__contact {
+		.site-nav__actions {
 			display: none;
 		}
 

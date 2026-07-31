@@ -15,9 +15,13 @@
 
 	let isHovering = false;
 	let isClicking = false;
-	let isHidden = false; // New state for hiding cursor
+	let isHidden = false;
+	let reducedMotion = true;
 
 	onMount(() => {
+		reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		if (reducedMotion) return;
+
 		const onMouseMove = (e: MouseEvent) => {
 			coords.set({ x: e.clientX, y: e.clientY });
 		};
@@ -67,7 +71,7 @@
 	});
 </script>
 
-{#if !$experienceStore.isPerformanceMode}
+{#if !$experienceStore.isPerformanceMode && !reducedMotion}
 <div 
 	class="liquid-cursor"
 	style:transform={`translate3d(${$coords.x}px, ${$coords.y}px, 0)`}
