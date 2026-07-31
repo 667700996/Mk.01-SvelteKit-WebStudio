@@ -1,307 +1,834 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import PageSection from '$lib/components/ui/PageSection.svelte';
-	import Surface from '$components/ui/Surface.svelte';
-	import Reveal from '$lib/components/motion/Reveal.svelte';
-	import TextReveal from '$lib/components/motion/TextReveal.svelte';
-	import Image from '$lib/components/ui/Image.svelte';
 	import type { PageData } from './$types';
+	import '../../../styles/home.css';
 
 	export let data: PageData;
 
-	const { project, related } = data;
-	const projectContent = project.content;
+	const presentation: Record<
+		string,
+		{ type: string; eyebrow: string; thesis: string; role: string; duration: string }
+	> = {
+		'neon-metropolis': {
+			type: 'orbital',
+			eyebrow: 'A living spatial identity',
+			thesis:
+				'What if a brand did not have a fixed form—only a recognisable way of behaving?',
+			role: 'Creative direction, interaction, WebGL',
+			duration: '7 weeks'
+		},
+		'atlas-labs': {
+			type: 'signal',
+			eyebrow: 'Making infrastructure visible',
+			thesis:
+				'How do you make a complex technical system feel precise before the first word is read?',
+			role: 'Product narrative, systems, frontend',
+			duration: '9 weeks'
+		},
+		flowstate: {
+			type: 'monolith',
+			eyebrow: 'An interface with a pulse',
+			thesis:
+				'Can motion respond to a human rhythm without becoming distracting or decorative?',
+			role: 'Product design, motion, prototyping',
+			duration: '8 weeks'
+		}
+	};
 
-	let activeSection = '';
-	let scrollY = 0;
+	const project = data.project;
+	const content = project.content;
+	const view = presentation[project.slug] ?? presentation['neon-metropolis'];
+	const kpis = content.kpis ?? [];
+	const nextProject = data.related[0];
 
-	// Intersection Observer for Table of Contents
+	let ready = false;
+
 	onMount(() => {
+		ready = true;
 		const observer = new IntersectionObserver(
 			(entries) => {
 				entries.forEach((entry) => {
 					if (entry.isIntersecting) {
-						activeSection = entry.target.id;
+						entry.target.classList.add('is-visible');
+						observer.unobserve(entry.target);
 					}
 				});
 			},
-			{ rootMargin: '-20% 0px -50% 0px' }
+			{ threshold: 0.14, rootMargin: '0px 0px -8% 0px' }
 		);
-
-		document.querySelectorAll('section[id]').forEach((section) => {
-			observer.observe(section);
-		});
-
+		document.querySelectorAll('[data-case-reveal]').forEach((element) => observer.observe(element));
 		return () => observer.disconnect();
 	});
-
-	function scrollTo(id: string) {
-		const el = document.getElementById(id);
-		if (el) {
-			el.scrollIntoView({ behavior: 'smooth' });
-		}
-	}
 </script>
 
-<svelte:window bind:scrollY />
-
-<div class="case-study-wrap">
-	<!-- Sticky Progress / TOC Rail -->
-	<aside class="toc-rail hidden lg:block" style:opacity={scrollY > 600 ? 1 : 0}>
-		<div class="toc-inner">
-			<span class="toc-label">Contents</span>
-			<nav>
-				<button 
-					class:active={activeSection === 'overview'} 
-					on:click={() => scrollTo('overview')}
-				>
-					Overview
-				</button>
-				<button 
-					class:active={activeSection === 'outcomes'} 
-					on:click={() => scrollTo('outcomes')}
-				>
-					Outcomes
-				</button>
-				<button 
-					class:active={activeSection === 'process'} 
-					on:click={() => scrollTo('process')}
-				>
-					Process
-				</button>
-				{#each projectContent.chapters as chapter, i}
-					<button 
-						class:active={activeSection === `chapter-${i}`} 
-						on:click={() => scrollTo(`chapter-${i}`)}
-					>
-						{chapter.title}
-					</button>
-				{/each}
-			</nav>
-			<div class="toc-progress">
-				<div 
-					class="progress-bar" 
-					style:height={`${Math.min(100, (scrollY / (document.body.scrollHeight - window.innerHeight)) * 100)}%`}
-				></div>
+<article class:ready class="case">
+	<header class="case-hero">
+		<div class="case-hero__top">
+			<a href="/work">← All systems</a>
+			<span>Case study / {project.year}</span>
+			<span>{project.industry}</span>
+		</div>
+		<div class="case-hero__title">
+			<p>{view.eyebrow}</p>
+			<h1>{project.title}</h1>
+		</div>
+		<div class="case-hero__bottom">
+			<p>{project.summary}</p>
+			<div>
+				<span>Scroll to deconstruct</span>
+				<i>↓</i>
 			</div>
 		</div>
-	</aside>
+	</header>
 
-	<!-- Hero Section -->
-	<PageSection id="overview" tone="contrast" padding="xl">
-		<div class="space-y-8 relative z-10">
-			<a href="/work" class="link-cta mb-8 inline-flex items-center gap-2 text-sm font-medium opacity-60 hover:opacity-100 transition-opacity">
-				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-left"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
-				Back to Index
-			</a>
-
-			<div class="space-y-6 max-w-4xl">
-				<div class="flex flex-wrap gap-3 mb-4">
-					{#each project.tags as tag}
-						<span class="px-3 py-1 rounded-full border border-primary/20 bg-primary/10 text-xs font-bold uppercase tracking-widest text-primary">
-							{tag}
-						</span>
-					{/each}
-				</div>
-				
-				<h1 class="text-5xl md:text-7xl font-bold tracking-tight leading-[1.1]">
-					<TextReveal text={project.title} type="word" />
-				</h1>
-				
-				<p class="text-xl md:text-2xl text-base-content/70 max-w-2xl leading-relaxed">
-					{project.summary}
-				</p>
-
-				<div class="grid grid-cols-2 md:grid-cols-4 gap-6 pt-8 border-t border-base-content/10">
-					<div>
-						<span class="text-xs uppercase tracking-widest text-base-content/50 block mb-1">Client</span>
-						<span class="font-medium">{project.client ?? 'Confidential'}</span>
-					</div>
-					<div>
-						<span class="text-xs uppercase tracking-widest text-base-content/50 block mb-1">Year</span>
-						<span class="font-medium">{project.year}</span>
-					</div>
-					<div>
-						<span class="text-xs uppercase tracking-widest text-base-content/50 block mb-1">Industry</span>
-						<span class="font-medium">{project.industry}</span>
-					</div>
-					<div>
-						<span class="text-xs uppercase tracking-widest text-base-content/50 block mb-1">Services</span>
-						<span class="font-medium">{projectContent.services?.[0] ?? 'Design'}</span>
-					</div>
-				</div>
-			</div>
-		</div>
-	</PageSection>
-
-	<!-- Cinematic Media Hero -->
-	<section class="w-full px-4 md:px-8 -mt-12 md:-mt-20 relative z-0">
-		<div class="aspect-video w-full rounded-2xl overflow-hidden shadow-2xl border border-base-content/10 relative">
-			{#if projectContent.hero.video}
-				<video autoplay muted playsinline loop class="w-full h-full object-cover">
-					<source src={projectContent.hero.video} type="video/mp4" />
-				</video>
+	<section class="case-art" aria-label="{project.title} visual system">
+		<div class="project-art project-art--{view.type} active" aria-hidden="true">
+			{#if view.type === 'orbital'}
+				<div class="orbital__core"></div>
+				<div class="orbital__ring orbital__ring--a"></div>
+				<div class="orbital__ring orbital__ring--b"></div>
+				<div class="orbital__ring orbital__ring--c"></div>
+			{:else if view.type === 'signal'}
+				<div class="signal__beam"></div>
+				<div class="signal__disc"></div>
+				<div class="signal__grid"></div>
 			{:else}
-				<Image
-					src={`/images/work/${project.slug}-hero.jpg`}
-					alt={project.title}
-					className="w-full h-full object-cover"
-				/>
+				<div class="monolith__block monolith__block--a"></div>
+				<div class="monolith__block monolith__block--b"></div>
+				<div class="monolith__type">R</div>
 			{/if}
-			<div class="absolute inset-0 bg-gradient-to-t from-base-100/90 via-transparent to-transparent pointer-events-none"></div>
-			<div class="absolute bottom-8 left-8 right-8 text-center md:text-left">
-				<h2 class="text-2xl md:text-4xl font-bold text-base-content mb-2">{projectContent.hero.headline}</h2>
-				<p class="text-base-content/80 text-lg">{projectContent.hero.subheadline}</p>
+			<div class="project-art__label">
+				<span>MK.01 / {project.slug}</span>
+				<span>GENERATIVE SYSTEM</span>
 			</div>
 		</div>
 	</section>
 
-	<!-- Outcomes Grid -->
-	<PageSection id="outcomes" tone="default">
-		<div class="grid gap-12 lg:grid-cols-[1fr_minmax(0,1.5fr)]">
-			<div class="space-y-6">
-				<span class="eyebrow text-primary">Key Outcomes</span>
-				<h2 class="text-3xl font-semibold">Impact by the numbers.</h2>
-				<p class="text-base-content/70 text-lg">
-					We don't just ship pixels; we ship performance. Here's how this project moved the needle.
-				</p>
-			</div>
-			
-			<div class="grid gap-4 sm:grid-cols-2">
-				{#each projectContent.kpis as kpi}
-					<Surface variant="glass" padding="lg" class="flex flex-col justify-between h-full">
-						<div>
-							<p class="text-xs uppercase tracking-widest text-base-content/50 mb-2">{kpi.label}</p>
-							<p class="text-4xl font-bold text-base-content">{kpi.value}</p>
-						</div>
-						{#if kpi.description}
-							<p class="text-sm text-base-content/70 mt-4 border-t border-base-content/10 pt-4">{kpi.description}</p>
-						{/if}
-					</Surface>
-				{/each}
+	<section class="case-overview" data-case-reveal>
+		<div class="case-section-label">
+			<span>( 01 )</span>
+			<span>The premise</span>
+		</div>
+		<div class="case-overview__body">
+			<h2>{view.thesis}</h2>
+			<div class="case-overview__meta">
+				<div>
+					<span>Role</span>
+					<p>{view.role}</p>
+				</div>
+				<div>
+					<span>Duration</span>
+					<p>{view.duration}</p>
+				</div>
+				<div>
+					<span>Core stack</span>
+					<p>{project.tags.join(' / ')}</p>
+				</div>
 			</div>
 		</div>
-	</PageSection>
+	</section>
 
-	<!-- Process / Timeline -->
-	<PageSection id="process" tone="subtle">
-		<div class="max-w-4xl mx-auto space-y-12">
-			<div class="text-center space-y-4">
-				<span class="eyebrow text-secondary">The Journey</span>
-				<h2 class="text-4xl font-bold">From concept to launch.</h2>
-			</div>
-
-			<div class="relative border-l border-base-content/10 ml-4 md:ml-0 space-y-12">
-				{#each projectContent.chapters as chapter, i}
-					<section id={`chapter-${i}`} class="pl-8 md:pl-12 relative group">
-						<span class="absolute -left-[5px] top-2 w-[9px] h-[9px] rounded-full bg-base-content/20 group-hover:bg-primary transition-colors ring-4 ring-base-100"></span>
-						
-						<Reveal delay={i * 0.1}>
-							<div class="grid md:grid-cols-[1fr_2fr] gap-8">
-								<div class="space-y-2">
-									<span class="text-xs font-mono text-primary/80">0{i + 1}</span>
-									<h3 class="text-2xl font-bold">{chapter.title}</h3>
-									<p class="text-sm text-base-content/60">{chapter.id}</p>
-								</div>
-								<div class="space-y-4">
-									<p class="text-lg leading-relaxed text-base-content/80">{chapter.description}</p>
-									{#if i === 0} 
-										<!-- Contextual visual for first chapter if avail -->
-										<div class="h-48 rounded-xl bg-base-300/50 border border-base-content/5 mt-4"></div>
-									{/if}
-								</div>
-							</div>
-						</Reveal>
-					</section>
-				{/each}
-			</div>
+	<section class="case-challenge" data-case-reveal>
+		<div class="case-section-label">
+			<span>( 02 )</span>
+			<span>Signal before surface</span>
 		</div>
-	</PageSection>
-
-	<!-- Related Work -->
-	<PageSection id="related" tone="contrast">
-		<div class="flex items-center justify-between mb-12">
-			<h2 class="text-3xl font-bold">Next up</h2>
-			<a href="/work" class="btn btn-outline">View all work</a>
+		<div>
+			<p class="case-challenge__lead">{content.hero.headline}</p>
+			<p class="case-challenge__copy">{content.hero.subheadline}</p>
 		</div>
-		
-		<div class="grid gap-8 md:grid-cols-2">
-			{#each related as item}
-				<a href={`/work/${item.slug}`} class="group relative block rounded-2xl overflow-hidden aspect-[4/3] bg-base-200">
-					<!-- Placeholder for related image -->
-					<div class="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20 opacity-0 group-hover:opacity-100 transition-opacity z-0"></div>
-					<div class="absolute inset-0 p-8 flex flex-col justify-end z-10">
-						<h3 class="text-2xl font-bold text-base-content translate-y-4 group-hover:translate-y-0 transition-transform">{item.title}</h3>
-						<p class="text-base-content/70 opacity-0 group-hover:opacity-100 transition-opacity delay-75">{item.summary}</p>
+	</section>
+
+	<section class="case-metrics" aria-label="Project outcomes">
+		{#each kpis as kpi, index}
+			<article data-case-reveal>
+				<span>0{index + 1}</span>
+				<strong>{kpi.value}</strong>
+				<p>{kpi.label} {kpi.description ?? ''}</p>
+			</article>
+		{/each}
+	</section>
+
+	<section class="case-process">
+		<header data-case-reveal>
+			<div class="case-section-label">
+				<span>( 03—05 )</span>
+				<span>From intent to system</span>
+			</div>
+			<h2>Three moves.<br />One coherent idea.</h2>
+		</header>
+
+		<div class="case-process__chapters">
+			{#each content.chapters as chapter, index}
+				<article data-case-reveal>
+					<div class="case-process__index">
+						<span>0{index + 1}</span>
+						<i></i>
 					</div>
-				</a>
+					<div>
+						<p>{chapter.id}</p>
+						<h3>{chapter.title}</h3>
+					</div>
+					<p>{chapter.description}</p>
+				</article>
 			{/each}
 		</div>
-	</PageSection>
-</div>
+	</section>
+
+	<section class="case-system" data-case-reveal>
+		<div class="case-system__grid" aria-hidden="true">
+			{#each Array(48) as _, index}
+				<i style:opacity={(index % 7) / 8 + 0.12}></i>
+			{/each}
+		</div>
+		<div class="case-system__copy">
+			<p>Built as a system, not a scene.</p>
+			<h2>Every expressive choice has a quieter technical decision beneath it.</h2>
+		</div>
+		<div class="case-system__spec">
+			<div><span>01</span><p>Progressive enhancement before spectacle.</p></div>
+			<div><span>02</span><p>Motion tokens shared across code and design.</p></div>
+			<div><span>03</span><p>Adaptive quality for real devices, not demo machines.</p></div>
+			<div><span>04</span><p>Reduced-motion behavior designed from the start.</p></div>
+		</div>
+	</section>
+
+	<section class="case-outcomes" data-case-reveal>
+		<div class="case-section-label">
+			<span>( 06 )</span>
+			<span>What moved</span>
+		</div>
+		<div class="case-outcomes__list">
+			{#each content.outcomes as outcome, index}
+				<p><span>0{index + 1}</span>{outcome}</p>
+			{/each}
+		</div>
+	</section>
+
+	{#if nextProject}
+		<a class="case-next" href="/work/{nextProject.slug}">
+			<span>Next system</span>
+			<strong>{nextProject.title}</strong>
+			<i>↗</i>
+		</a>
+	{/if}
+</article>
 
 <style>
-	.toc-rail {
-		position: fixed;
-		left: 2rem;
-		top: 50%;
-		transform: translateY(-50%);
-		z-index: 50;
-		transition: opacity 0.4s ease;
+	.case {
+		--gutter: clamp(18px, 3vw, 50px);
+		overflow: clip;
+		background: #080907;
+		color: #f0f0e8;
 	}
 
-	.toc-inner {
+	[data-case-reveal] {
+		opacity: 0;
+		transform: translateY(46px);
+		transition:
+			opacity 1s cubic-bezier(0.16, 1, 0.3, 1),
+			transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+
+	[data-case-reveal].is-visible {
+		opacity: 1;
+		transform: none;
+	}
+
+	.case-hero {
 		display: flex;
+		min-height: max(720px, 100svh);
 		flex-direction: column;
-		gap: 1rem;
-		padding-left: 1rem;
-		border-left: 1px solid rgba(255, 255, 255, 0.1);
-		position: relative;
+		justify-content: flex-end;
+		padding: 94px var(--gutter) 28px;
+		background:
+			linear-gradient(to right, rgba(240, 240, 232, 0.045) 1px, transparent 1px),
+			#080907;
+		background-size: calc((100vw - var(--gutter) * 2) / 12) 100%;
 	}
 
-	.toc-progress {
+	.case-hero__top {
 		position: absolute;
-		left: -1px;
-		top: 0;
-		bottom: 0;
-		width: 1px;
-		background: rgba(255, 255, 255, 0.1);
-	}
-
-	.progress-bar {
-		width: 2px;
-		background: var(--primary);
-		margin-left: -0.5px;
-		transition: height 0.1s linear;
-	}
-
-	.toc-label {
+		inset: 92px var(--gutter) auto;
+		display: grid;
+		grid-template-columns: 1fr 1fr auto;
+		gap: 30px;
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 8px;
+		letter-spacing: 0.1em;
 		text-transform: uppercase;
-		letter-spacing: 0.2em;
-		font-size: 0.7rem;
-		color: var(--base-content);
-		opacity: 0.5;
-		margin-bottom: 0.5rem;
 	}
 
-	nav button {
-		display: block;
-		text-align: left;
-		font-size: 0.85rem;
-		color: var(--base-content);
-		opacity: 0.6;
-		transition: all 0.2s ease;
-		padding: 0.2rem 0;
+	.case-hero__top a {
+		width: fit-content;
+		color: #f0f0e8;
 	}
 
-	nav button:hover {
+	.case-hero__top span {
+		color: rgba(240, 240, 232, 0.42);
+	}
+
+	.case-hero__title p {
+		margin: 0 0 24px 0.5vw;
+		color: #d7ff55;
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 9px;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		opacity: 0;
+		transform: translateY(20px);
+		transition: 0.8s 0.1s ease;
+	}
+
+	.case-hero h1 {
+		margin: 0;
+		color: #f0f0e8;
+		font-family: 'Syne', sans-serif;
+		font-size: clamp(126px, 23.5vw, 400px);
+		font-weight: 600;
+		letter-spacing: -0.11em;
+		line-height: 0.62;
+		text-transform: uppercase;
+		opacity: 0;
+		transform: translateY(0.3em);
+		transition: 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+
+	.ready .case-hero h1,
+	.ready .case-hero__title p {
 		opacity: 1;
-		transform: translateX(4px);
+		transform: none;
 	}
 
-	nav button.active {
-		opacity: 1;
-		color: var(--primary);
+	.case-hero__bottom {
+		display: grid;
+		grid-template-columns: minmax(280px, 0.7fr) 1fr auto;
+		gap: 40px;
+		align-items: end;
+		margin-top: clamp(80px, 10vh, 120px);
+		border-top: 1px solid rgba(240, 240, 232, 0.15);
+		padding-top: 18px;
+	}
+
+	.case-hero__bottom > p {
+		max-width: 460px;
+		margin: 0;
+		color: rgba(240, 240, 232, 0.62);
+		font-size: 14px;
+		line-height: 1.55;
+	}
+
+	.case-hero__bottom > div {
+		grid-column: 3;
+		display: flex;
+		align-items: center;
+		gap: 18px;
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 8px;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+	}
+
+	.case-hero__bottom i {
+		color: #d7ff55;
+		font-size: 16px;
+		font-style: normal;
+	}
+
+	.case-art {
+		position: relative;
+		height: min(86vw, 1040px);
+		min-height: 560px;
+		margin: 0 var(--gutter);
+		overflow: hidden;
+		background: #090a08;
+	}
+
+	.case-art .project-art {
+		inset: 0;
+	}
+
+	.case-art .orbital__core {
+		width: 19%;
+	}
+
+	.case-art .project-art__label {
+		font-size: 9px;
+	}
+
+	.case-section-label {
+		display: grid;
+		grid-template-columns: minmax(120px, 0.45fr) 1fr;
+		gap: 24px;
+		color: rgba(240, 240, 232, 0.42);
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 8px;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+	}
+
+	.case-overview {
+		padding: clamp(130px, 18vw, 280px) var(--gutter);
+	}
+
+	.case-overview__body {
+		display: grid;
+		grid-template-columns: minmax(0, 1.5fr) minmax(260px, 0.5fr);
+		gap: clamp(70px, 10vw, 180px);
+		margin-top: clamp(80px, 10vw, 150px);
+	}
+
+	.case-overview h2 {
+		max-width: 1100px;
+		margin: 0;
+		font-family: 'Syne', sans-serif;
+		font-size: clamp(56px, 8vw, 138px);
 		font-weight: 500;
+		letter-spacing: -0.075em;
+		line-height: 0.91;
+	}
+
+	.case-overview__meta {
+		align-self: end;
+	}
+
+	.case-overview__meta > div {
+		border-top: 1px solid rgba(240, 240, 232, 0.15);
+		padding: 16px 0 25px;
+	}
+
+	.case-overview__meta span {
+		color: rgba(240, 240, 232, 0.38);
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 8px;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+	}
+
+	.case-overview__meta p {
+		margin: 9px 0 0;
+		color: rgba(240, 240, 232, 0.76);
+		font-size: 13px;
+		line-height: 1.5;
+	}
+
+	.case-challenge {
+		display: grid;
+		grid-template-columns: minmax(240px, 0.45fr) 1.55fr;
+		gap: 50px;
+		padding: clamp(100px, 14vw, 220px) var(--gutter);
+		background: #f0f0e8;
+		color: #080907;
+	}
+
+	.case-challenge .case-section-label {
+		color: rgba(8, 9, 7, 0.45);
+	}
+
+	.case-challenge__lead {
+		max-width: 1100px;
+		margin: 0 0 70px;
+		font-family: 'Syne', sans-serif;
+		font-size: clamp(54px, 7.2vw, 124px);
+		font-weight: 500;
+		letter-spacing: -0.07em;
+		line-height: 0.91;
+	}
+
+	.case-challenge__copy {
+		max-width: 630px;
+		margin: 0 0 0 auto;
+		color: rgba(8, 9, 7, 0.58);
+		font-size: clamp(16px, 1.5vw, 22px);
+		line-height: 1.55;
+	}
+
+	.case-metrics {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		background: #d7ff55;
+		color: #080907;
+	}
+
+	.case-metrics article {
+		min-height: 420px;
+		border-right: 1px solid rgba(8, 9, 7, 0.26);
+		padding: 30px var(--gutter);
+	}
+
+	.case-metrics article:last-child {
+		border-right: none;
+	}
+
+	.case-metrics article > span {
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 8px;
+	}
+
+	.case-metrics strong {
+		display: block;
+		margin-top: 130px;
+		font-family: 'Syne', sans-serif;
+		font-size: clamp(50px, 6vw, 104px);
+		font-weight: 600;
+		letter-spacing: -0.07em;
+		line-height: 0.85;
+	}
+
+	.case-metrics p {
+		margin: 18px 0 0;
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 8px;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+	}
+
+	.case-process {
+		padding: clamp(130px, 18vw, 280px) var(--gutter);
+		background: #080907;
+	}
+
+	.case-process > header {
+		display: grid;
+		grid-template-columns: minmax(240px, 0.45fr) 1.55fr;
+		gap: 50px;
+		margin-bottom: clamp(100px, 14vw, 200px);
+	}
+
+	.case-process h2 {
+		margin: 0;
+		font-family: 'Syne', sans-serif;
+		font-size: clamp(62px, 9vw, 152px);
+		font-weight: 500;
+		letter-spacing: -0.08em;
+		line-height: 0.84;
+	}
+
+	.case-process__chapters {
+		border-top: 1px solid rgba(240, 240, 232, 0.16);
+	}
+
+	.case-process__chapters article {
+		display: grid;
+		grid-template-columns: minmax(100px, 0.2fr) 0.72fr minmax(300px, 0.6fr);
+		gap: 40px;
+		align-items: start;
+		border-bottom: 1px solid rgba(240, 240, 232, 0.16);
+		padding: clamp(50px, 6vw, 90px) 0;
+	}
+
+	.case-process__index {
+		display: flex;
+		align-items: center;
+		gap: 16px;
+		color: #d7ff55;
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 8px;
+	}
+
+	.case-process__index i {
+		width: 40px;
+		height: 1px;
+		background: rgba(215, 255, 85, 0.4);
+	}
+
+	.case-process__chapters article > div:nth-child(2) p {
+		margin: 0 0 18px;
+		color: rgba(240, 240, 232, 0.35);
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 8px;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+	}
+
+	.case-process h3 {
+		margin: 0;
+		font-family: 'Syne', sans-serif;
+		font-size: clamp(34px, 4vw, 66px);
+		font-weight: 500;
+		letter-spacing: -0.06em;
+		line-height: 0.95;
+	}
+
+	.case-process__chapters article > p {
+		max-width: 500px;
+		margin: 0;
+		color: rgba(240, 240, 232, 0.55);
+		font-size: 14px;
+		line-height: 1.65;
+	}
+
+	.case-system {
+		position: relative;
+		display: grid;
+		grid-template-columns: 1.15fr 0.85fr;
+		gap: 70px;
+		min-height: 900px;
+		padding: clamp(100px, 13vw, 200px) var(--gutter);
+		background: #11120f;
+	}
+
+	.case-system__grid {
+		position: absolute;
+		inset: 0;
+		display: grid;
+		grid-template-columns: repeat(8, 1fr);
+		grid-template-rows: repeat(6, 1fr);
+		opacity: 0.18;
+		pointer-events: none;
+	}
+
+	.case-system__grid i {
+		border-right: 1px solid #d7ff55;
+		border-bottom: 1px solid #d7ff55;
+	}
+
+	.case-system__copy {
+		position: relative;
+		z-index: 1;
+	}
+
+	.case-system__copy > p {
+		color: #d7ff55;
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 8px;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+	}
+
+	.case-system__copy h2 {
+		max-width: 900px;
+		margin: 70px 0 0;
+		font-family: 'Syne', sans-serif;
+		font-size: clamp(50px, 6.4vw, 110px);
+		font-weight: 500;
+		letter-spacing: -0.07em;
+		line-height: 0.9;
+	}
+
+	.case-system__spec {
+		position: relative;
+		z-index: 1;
+		align-self: end;
+	}
+
+	.case-system__spec > div {
+		display: grid;
+		grid-template-columns: 40px 1fr;
+		gap: 20px;
+		border-top: 1px solid rgba(240, 240, 232, 0.19);
+		padding: 20px 0 28px;
+	}
+
+	.case-system__spec span {
+		color: #d7ff55;
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 8px;
+	}
+
+	.case-system__spec p {
+		margin: 0;
+		color: rgba(240, 240, 232, 0.7);
+		font-size: 13px;
+		line-height: 1.5;
+	}
+
+	.case-outcomes {
+		display: grid;
+		grid-template-columns: minmax(240px, 0.45fr) 1.55fr;
+		gap: 50px;
+		padding: clamp(130px, 17vw, 260px) var(--gutter);
+	}
+
+	.case-outcomes__list {
+		border-top: 1px solid rgba(240, 240, 232, 0.16);
+	}
+
+	.case-outcomes__list p {
+		display: grid;
+		grid-template-columns: 55px 1fr;
+		gap: 24px;
+		margin: 0;
+		border-bottom: 1px solid rgba(240, 240, 232, 0.16);
+		padding: 34px 0;
+		font-family: 'Syne', sans-serif;
+		font-size: clamp(24px, 3vw, 49px);
+		letter-spacing: -0.045em;
+		line-height: 1.15;
+	}
+
+	.case-outcomes__list span {
+		padding-top: 7px;
+		color: #d7ff55;
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 8px;
+		letter-spacing: 0;
+	}
+
+	.case-next {
+		position: relative;
+		display: block;
+		overflow: hidden;
+		padding: clamp(100px, 14vw, 210px) var(--gutter) 50px;
+		background: #d7ff55;
+		color: #080907;
+	}
+
+	.case-next > span {
+		font-family: 'JetBrains Mono', monospace;
+		font-size: 9px;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+	}
+
+	.case-next strong {
+		display: block;
+		margin-top: 70px;
+		font-family: 'Syne', sans-serif;
+		font-size: clamp(100px, 22vw, 360px);
+		font-weight: 600;
+		letter-spacing: -0.1em;
+		line-height: 0.64;
+		text-transform: uppercase;
+	}
+
+	.case-next i {
+		position: absolute;
+		right: var(--gutter);
+		bottom: 45px;
+		font-size: clamp(45px, 7vw, 100px);
+		font-style: normal;
+		transition: transform 400ms cubic-bezier(0.16, 1, 0.3, 1);
+	}
+
+	.case-next:hover i {
+		transform: rotate(45deg);
+	}
+
+	@media (max-width: 820px) {
+		.case-overview__body,
+		.case-challenge,
+		.case-process > header,
+		.case-system,
+		.case-outcomes {
+			grid-template-columns: 1fr;
+		}
+
+		.case-overview__meta {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			gap: 20px;
+		}
+
+		.case-process__chapters article {
+			grid-template-columns: 60px 1fr;
+		}
+
+		.case-process__chapters article > p {
+			grid-column: 2;
+		}
+
+		.case-system {
+			min-height: auto;
+		}
+
+		.case-system__spec {
+			margin-top: 100px;
+		}
+	}
+
+	@media (max-width: 600px) {
+		.case-hero {
+			min-height: 720px;
+		}
+
+		.case-hero__top {
+			grid-template-columns: 1fr auto;
+		}
+
+		.case-hero__top span:last-child {
+			display: none;
+		}
+
+		.case-hero h1 {
+			font-size: clamp(104px, 32vw, 180px);
+			line-height: 0.68;
+		}
+
+		.case-hero__bottom {
+			display: block;
+		}
+
+		.case-hero__bottom > p {
+			font-size: 12px;
+		}
+
+		.case-hero__bottom > div {
+			margin-top: 24px;
+		}
+
+		.case-art {
+			height: 72svh;
+			min-height: 490px;
+		}
+
+		.case-overview h2,
+		.case-challenge__lead {
+			font-size: 50px;
+		}
+
+		.case-overview__meta {
+			grid-template-columns: 1fr;
+		}
+
+		.case-metrics {
+			grid-template-columns: 1fr;
+		}
+
+		.case-metrics article {
+			min-height: 270px;
+			border-right: none;
+			border-bottom: 1px solid rgba(8, 9, 7, 0.26);
+		}
+
+		.case-metrics strong {
+			margin-top: 70px;
+		}
+
+		.case-process h2 {
+			font-size: 58px;
+		}
+
+		.case-process__chapters article {
+			display: block;
+		}
+
+		.case-process__index {
+			margin-bottom: 30px;
+		}
+
+		.case-process__chapters article > p {
+			margin-top: 32px;
+		}
+
+		.case-system__copy h2 {
+			font-size: 48px;
+		}
+
+		.case-outcomes__list p {
+			grid-template-columns: 34px 1fr;
+			font-size: 24px;
+		}
+
+		.case-next strong {
+			font-size: 96px;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		[data-case-reveal] {
+			opacity: 1;
+			transform: none;
+		}
 	}
 </style>
