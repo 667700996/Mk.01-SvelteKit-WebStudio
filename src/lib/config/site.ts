@@ -1,17 +1,18 @@
 export const siteConfig = {
-  name: "Mk.01 SvelteKit Studio",
-  shortName: "Mk.01 Studio",
+  name: "MK.01 — Creative Technology Studio",
+  shortName: "MK.01",
   description:
-    "A world-class creative lab designing purposeful web experiences, launch systems, and immersive storytelling with SvelteKit.",
+    "An independent creative technology studio building digital flagships, interactive systems, and WebGL experiences.",
   url: {
     origin: "https://mk1.studio",
     basePath: "",
   },
   keywords: [
-    "design studio",
-    "sveltekit agency",
+    "creative technology studio",
+    "interactive design",
+    "WebGL studio",
+    "SvelteKit",
     "creative technology",
-    "design systems",
     "digital storytelling",
   ],
   social: {

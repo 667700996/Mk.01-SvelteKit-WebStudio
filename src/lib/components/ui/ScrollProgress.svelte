@@ -36,17 +36,17 @@
 		top: 0;
 		left: 0;
 		right: 0;
-		height: 3px;
-		z-index: 100;
+		height: 2px;
+		z-index: 120;
 		pointer-events: none;
 		background: transparent;
 	}
 
 	.scroll-progress-bar {
 		height: 100%;
-		background: var(--primary, #00fff9); /* Fallback to cyan */
+		background: #d7ff55;
 		transform-origin: 0 50%;
 		width: 100%;
-		box-shadow: 0 0 10px var(--primary, #00fff9);
+		box-shadow: 0 0 10px rgba(215, 255, 85, 0.45);
 	}
 </style>

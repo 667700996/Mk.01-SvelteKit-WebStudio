@@ -20,9 +20,11 @@ export const load = async () => {
     projects: sampleProjects.slice(0, 6),
     posts,
     seo: buildSeo({
-      title: appConfig.identity.tagline,
-      description: appConfig.identity.description,
+      title: "Digital matter, engineered",
+      description:
+        "Mk.01 is an independent creative technology studio crafting digital flagships, interactive systems, and WebGL experiences for ambitious brands.",
       path: "/",
+      image: "/og.png",
     }),
   };
 };
