@@ -1,178 +1,118 @@
-type PostMetadata = {
-  title: string;
-  date: string;
+import { render } from "svelte/server";
+import type { Component } from "svelte";
+
+/** Frontmatter as authored. Older entries use `excerpt` and string reading times. */
+interface RawFrontmatter {
+  title?: string;
+  date?: string | Date;
   description?: string;
+  excerpt?: string;
   tags?: string[];
   category?: string;
   author?: string;
   draft?: boolean;
-  readingTime?: number;
-  wordCount?: number;
-  heroImage?: string;
+  readingTime?: number | string;
   [key: string]: unknown;
-};
+}
 
-type PostEntry = PostMetadata & {
+interface PostModule {
+  metadata?: RawFrontmatter;
+  default: Component;
+}
+
+export interface Post {
   slug: string;
+  title: string;
   date: string;
-  readingTime: number;
-  wordCount: number;
+  description: string;
+  category: string;
   tags: string[];
   author: string;
+  readingTime: number;
+  wordCount: number;
+  draft: boolean;
+}
+
+const WORDS_PER_MINUTE = 220;
+
+// Both collections are eagerly bundled server-side: they are tiny, and this
+// avoids a waterfall of dynamic imports on every journal request.
+const modules = {
+  ...import.meta.glob<PostModule>("/src/posts/*.md", { eager: true }),
+  ...import.meta.glob<PostModule>("/src/content/articles/*.mdx", { eager: true }),
 };
 
-const AVERAGE_READING_SPEED = 200; // words per minute
-
-const markdownModules = import.meta.glob<PostModule>("/src/posts/*.md");
-const mdxModules = import.meta.glob<PostModule>("/src/content/articles/*.mdx");
-
-function normalizeDate(value: unknown): string | null {
-  if (typeof value !== "string") {
-    return null;
-  }
-
-  const parsed = new Date(value);
-
-  if (Number.isNaN(parsed.getTime())) {
-    return null;
-  }
-
-  return parsed.toISOString();
+function slugFromPath(path: string) {
+  return path.split("/").pop()!.replace(/\.mdx?$/, "");
 }
 
-function stripHtml(html: string) {
-  return html
+function toIsoDate(value: unknown): string {
+  const date = value instanceof Date ? value : typeof value === "string" ? new Date(value) : null;
+  return date && !Number.isNaN(date.getTime()) ? date.toISOString() : "";
+}
+
+function countWords(component: Component) {
+  const { body } = render(component);
+  const text = body
+    .replace(/<pre[\s\S]*?<\/pre>/g, " ")
     .replace(/<[^>]+>/g, " ")
-    .replace(/\s+/g, " ")
+    .replace(/&[a-z#0-9]+;/gi, " ")
     .trim();
+  return text ? text.split(/\s+/).length : 0;
 }
 
-function deriveReadingStats(html: string) {
-  const text = stripHtml(html);
-  const words = text.length > 0 ? text.split(" ").length : 0;
-  const minutes = Math.max(1, Math.round(words / AVERAGE_READING_SPEED));
+function normalise(path: string, mod: PostModule): Post {
+  const meta = mod.metadata ?? {};
+  const wordCount = countWords(mod.default);
+  const declaredMinutes = Number.parseInt(String(meta.readingTime ?? ""), 10);
 
   return {
-    words,
-    minutes,
+    slug: slugFromPath(path),
+    title: meta.title ?? slugFromPath(path),
+    date: toIsoDate(meta.date),
+    description: meta.description ?? meta.excerpt ?? "",
+    category: meta.category ?? "Uncategorized",
+    tags: Array.isArray(meta.tags) ? meta.tags.map((tag) => String(tag).trim()).filter(Boolean) : [],
+    author: meta.author ?? "Mk.01 Studio",
+    readingTime: Number.isFinite(declaredMinutes)
+      ? declaredMinutes
+      : Math.max(1, Math.round(wordCount / WORDS_PER_MINUTE)),
+    wordCount,
+    draft: meta.draft === true,
   };
 }
 
-async function resolveModules(
-  modules: Record<string, () => Promise<PostModule>>,
-  extension: string,
-) {
-  const posts = await Promise.all(
-    Object.entries(modules).map(async ([path, resolver]) => {
-      const mod = await resolver();
-      const { metadata } = mod;
+const posts: Post[] = Object.entries(modules)
+  .map(([path, mod]) => normalise(path, mod))
+  .filter((post) => !post.draft)
+  .sort((a, b) => b.date.localeCompare(a.date));
 
-      const slug = path.split("/").pop()?.replace(extension, "") ?? "";
-      const rendered = renderContent(mod);
-      const { minutes, words } = deriveReadingStats(rendered.html ?? "");
-      const isoDate = metadata?.date ? normalizeDate(metadata.date) : null;
-
-      const typedMetadata = metadata as PostMetadata;
-
-      return {
-        ...typedMetadata,
-        slug,
-        date: isoDate ?? typedMetadata.date ?? "",
-        readingTime:
-          typeof typedMetadata.readingTime === "number"
-            ? typedMetadata.readingTime
-            : minutes,
-        wordCount:
-          typeof typedMetadata.wordCount === "number"
-            ? typedMetadata.wordCount
-            : words,
-        tags: Array.isArray(typedMetadata.tags) ? typedMetadata.tags : [],
-        category: typedMetadata.category ?? "Uncategorized",
-        author: typedMetadata.author ?? "Mk.01 Studio",
-      };
-    }),
-  );
-
+export function getAllPosts(): Post[] {
   return posts;
 }
 
-export async function getAllPosts(): Promise<PostEntry[]> {
-  const [markdownPosts, mdxPosts] = await Promise.all([
-    resolveModules(markdownModules, ".md"),
-    resolveModules(mdxModules, ".mdx"),
-  ]);
-
-  const posts = [...markdownPosts, ...mdxPosts];
-
-  return posts.sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-  );
+export function getPostBySlug(slug: string): Post | null {
+  return posts.find((post) => post.slug === slug) ?? null;
 }
 
-export async function getRecentPosts(limit = 3): Promise<PostEntry[]> {
-  const posts = await getAllPosts();
-  return posts.filter((post) => post.draft !== true).slice(0, limit);
+export function getRelatedPosts(post: Post, limit = 3): Post[] {
+  return posts
+    .filter((entry) => entry.slug !== post.slug)
+    .map((entry) => ({
+      entry,
+      score:
+        (entry.category === post.category ? 2 : 0) +
+        entry.tags.filter((tag) => post.tags.includes(tag)).length,
+    }))
+    .sort((a, b) => b.score - a.score || b.entry.date.localeCompare(a.entry.date))
+    .slice(0, limit)
+    .map(({ entry }) => entry);
 }
 
-export async function getPostBySlug(
-  slug: string,
-): Promise<(PostEntry & { component: PostModule["default"] }) | null> {
-  const resolver =
-    markdownModules[`/src/posts/${slug}.md`] ??
-    mdxModules[`/src/content/articles/${slug}.mdx`];
-
-  if (!resolver) {
-    return null;
-  }
-
-  const mod = await resolver();
-  const { metadata, default: component } = mod;
-
-  const rendered = renderContent(mod);
-  const { minutes, words } = deriveReadingStats(rendered.html ?? "");
-  const isoDate = metadata?.date ? normalizeDate(metadata.date) : null;
-  const typedMetadata = metadata as PostMetadata;
-
-  return {
-    ...typedMetadata,
-    slug,
-    component,
-    date: isoDate ?? typedMetadata.date ?? "",
-    readingTime:
-      typeof typedMetadata.readingTime === "number"
-        ? typedMetadata.readingTime
-        : minutes,
-    wordCount:
-      typeof typedMetadata.wordCount === "number"
-        ? typedMetadata.wordCount
-        : words,
-    tags: Array.isArray(typedMetadata.tags) ? typedMetadata.tags : [],
-    category: typedMetadata.category ?? "Uncategorized",
-    author: typedMetadata.author ?? "Mk.01 Studio",
-  };
-}
-
-type PostModule = {
-  metadata: PostMetadata;
-  default?: {
-    render?: () => {
-      html: string;
-    };
-  };
-  render?: () => {
-    html: string;
-  };
-} & Record<string, unknown>;
-
-function renderContent(mod: PostModule) {
-  const renderFn =
-    typeof mod.render === "function"
-      ? mod.render
-      : typeof mod.default === "object" &&
-          mod.default &&
-          "render" in mod.default
-        ? (mod.default.render as (() => { html: string }) | undefined)
-        : undefined;
-
-  return renderFn ? renderFn() : { html: "" };
+export function getCategories(): { name: string; slug: string; count: number }[] {
+  const counts = new Map<string, number>();
+  for (const post of posts) counts.set(post.category, (counts.get(post.category) ?? 0) + 1);
+  return [...counts]
+    .map(([name, count]) => ({ name, slug: name.toLowerCase(), count }))
+    .sort((a, b) => a.name.localeCompare(b.name));
 }
