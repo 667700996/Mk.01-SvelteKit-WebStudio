@@ -92,3 +92,39 @@ test("journal search filters the index", async ({ page }) => {
   await expect(page.getByRole("link", { name: "Building a Cinematic Launch Playbook" })).toBeVisible();
   await expect(page.getByRole("link", { name: "My First Blog Post" })).toHaveCount(0);
 });
+
+test("performance HUD reports real measurements and persists", async ({ page, isMobile }) => {
+  test.skip(isMobile, "keyboard-driven");
+  await page.goto("/");
+  await page.locator("body").click({ position: { x: 5, y: 400 } });
+  await page.keyboard.press("p");
+
+  const hud = page.getByRole("complementary", { name: "Performance of this visit" });
+  await expect(hud).toBeVisible();
+  // The LCP row: a measured duration, never the "—" placeholder.
+  await expect(hud.locator("dd").nth(1)).toHaveText(/\d+ ms|\d\.\d\d s/);
+
+  await page.reload();
+  await expect(hud).toBeVisible();
+  await hud.getByRole("button", { name: "Close performance panel" }).click();
+  await expect(hud).toBeHidden();
+});
+
+test("colophon computes contrast from the live tokens", async ({ page }) => {
+  await page.goto("/colophon");
+  await expect(page.getByText("19.67 : 1")).toBeVisible();
+  await page.getByRole("radio", { name: "Dark" }).check();
+  await expect(page.getByText("17.74 : 1")).toBeVisible();
+});
+
+test("tapping the Mono/R plate sets its tempo", async ({ page }) => {
+  await page.goto("/work/flowstate");
+  const plate = page.getByRole("img", { name: /pulses to a tempo/ });
+  await plate.scrollIntoViewIfNeeded();
+  for (let i = 0; i < 4; i++) {
+    await plate.click({ position: { x: 200, y: 120 } });
+    await page.waitForTimeout(400);
+  }
+  await expect(plate).not.toContainText("72 BPM");
+  await expect(plate).toContainText(/\d+ BPM/);
+});

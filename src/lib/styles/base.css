@@ -387,3 +387,13 @@ main > :last-child {
 		animation: none !important;
 	}
 }
+
+/* Shared elements (plates, titles) morph between routes on the same curve. */
+::view-transition-group(*) {
+	animation-duration: 520ms;
+	animation-timing-function: var(--ease-out);
+}
+
+::view-transition-group(root) {
+	animation-duration: var(--duration-3);
+}

@@ -61,7 +61,8 @@ choice is applied before first paint by an inline script in `app.html`.
 - `data-reveal` uses CSS scroll-driven animation (`animation-timeline: view()`):
   zero JavaScript, and unsupported browsers simply show the content.
 - Route changes cross-fade with the View Transitions API; the header is excluded
-  so it stays perfectly still.
+  so it stays perfectly still. Plates and titles carry `view-transition-name`s
+  (`plate-<slug>`, `title-<slug>`) and morph between list and case study.
 - Canvas pieces (`SignalField`, `LabCanvas`) sleep off-screen and in hidden tabs,
   cap DPR at 2, read colours from tokens, and render on demand under reduced motion.
 
@@ -72,6 +73,8 @@ choice is applied before first paint by an inline script in `app.html`.
 | `PageHeader`     | Label, title, lead and actions for every secondary page    |
 | `SectionHead`    | Indexed section label + title + intro on the 12-col grid   |
 | `Plate`          | Resolution-independent drawing for each case study         |
+| `LivePlate`      | The case-study hero as a working system (steer, tune, tap tempo) |
+| `PerfHud`        | Live Web Vitals of the current visit (P, or ⌘K)             |
 | `LabGlyph`       | Deterministic per-experiment drawing                       |
 | `CommandPalette` | Native `<dialog>` combobox, fuzzy search over a static index |
 | `Kbd`, `LocalTime`, `ThemeSwitch`, `CtaBand` | Small, single-purpose primitives |

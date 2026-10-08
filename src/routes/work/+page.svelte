@@ -60,13 +60,18 @@
 					index="Case {pad(index + 1)}"
 					caption={project.industry}
 					ratio="16 / 9"
+					name="plate-{project.slug}"
 				/>
 			</a>
 			<div class="grid info" data-reveal>
 				<p class="label number">{pad(index + 1)}</p>
 				<div class="title">
 					<h2 class="h2" id="{project.slug}-title">
-						<a class="plate-host" href="/work/{project.slug}">{project.title}</a>
+						<a
+							class="plate-host"
+							href="/work/{project.slug}"
+							style:view-transition-name="title-{project.slug}">{project.title}</a
+						>
 					</h2>
 					<p class="label">{project.year} · {project.industry}</p>
 				</div>

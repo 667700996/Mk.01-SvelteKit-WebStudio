@@ -68,13 +68,37 @@
 	];
 
 	const practice = ['Strategy', 'Interaction', 'WebGL', 'Motion', 'Systems'];
+
+	// The hero's 12-column grid answers the pointer: the column underneath lights
+	// up and reports its index. Mouse and pen only; one rect read per move.
+	let columns = $state<HTMLElement>();
+	let activeColumn = $state<number | null>(null);
+
+	function trackColumn(event: PointerEvent) {
+		if (event.pointerType === 'touch' || !columns) return;
+		const spans = columns.children;
+		activeColumn = null;
+		for (let i = 0; i < spans.length; i++) {
+			const rect = spans[i].getBoundingClientRect();
+			if (rect.width && event.clientX >= rect.left && event.clientX < rect.right) {
+				activeColumn = i;
+				break;
+			}
+		}
+	}
 </script>
 
 <!-- Hero ------------------------------------------------------------------>
-<section class="hero" aria-labelledby="hero-title">
-	<div class="hero-columns wrap grid" aria-hidden="true">
+<section
+	class="hero"
+	aria-labelledby="hero-title"
+	onpointermove={trackColumn}
+	onpointerleave={() => (activeColumn = null)}
+>
+	<div class="hero-columns wrap grid" aria-hidden="true" bind:this={columns}>
 		{#each { length: 12 } as _, i}
-			<span style:--i={i}></span>
+			<span style:--i={i} class:active={activeColumn === i} data-col={String(i + 1).padStart(2, '0')}
+			></span>
 		{/each}
 	</div>
 
@@ -147,14 +171,19 @@
 			<li>
 				<a class="project grid plate-host" href="/work/{project.slug}" data-reveal>
 					<div class="project-plate">
-						<Plate kind={project.type} index="MK / Case {project.index}" caption="Live system" />
+						<Plate
+							kind={project.type}
+							index="MK / Case {project.index}"
+							caption="Live system"
+							name="plate-{project.slug}"
+						/>
 					</div>
 					<div class="project-info">
 						<p class="label project-meta">
 							<span>{project.index}</span>
 							<span>{project.discipline}</span>
 						</p>
-						<h3 class="h2">{project.title}</h3>
+						<h3 class="h2" style:view-transition-name="title-{project.slug}">{project.title}</h3>
 						<p class="secondary project-statement">{project.statement}</p>
 						<p class="metric">
 							<strong class="h3 tabular">{project.metric}</strong>
@@ -260,6 +289,33 @@
 		animation: column-in 1.2s var(--ease-out) both;
 		animation-delay: calc(var(--i) * 40ms);
 		mask-image: linear-gradient(to bottom, #000 0%, transparent 92%);
+	}
+
+	.hero-columns span {
+		position: relative;
+		transition: background-color var(--duration-3) var(--ease-out);
+	}
+
+	.hero-columns span.active {
+		background: color-mix(in oklab, var(--fg) 3.5%, transparent);
+		transition-duration: var(--duration-1);
+	}
+
+	.hero-columns span::after {
+		content: attr(data-col);
+		position: absolute;
+		top: var(--space-2);
+		left: var(--space-2);
+		color: var(--fg-3);
+		font-family: var(--font-mono);
+		font-size: 0.625rem;
+		letter-spacing: var(--track-label);
+		opacity: 0;
+		transition: opacity var(--duration-2) var(--ease-out);
+	}
+
+	.hero-columns span.active::after {
+		opacity: 1;
 	}
 
 	.hero-columns span:last-child {

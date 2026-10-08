@@ -23,13 +23,14 @@
 						index="MK / Case {pad(index + 1)}"
 						caption="Case study"
 						ratio="4 / 5"
+						name="plate-{project.slug}"
 					/>
 					<p class="label meta">
 						<span>{pad(index + 1)}</span>
 						<span>{project.industry}</span>
 						<span class="year">{project.year}</span>
 					</p>
-					<h2 class="h3">{project.title}</h2>
+					<h2 class="h3" style:view-transition-name="title-{project.slug}">{project.title}</h2>
 					<p class="secondary">{project.summary}</p>
 					<p class="label tags">{project.tags.join(' / ')}</p>
 					<span class="open">View case study <span class="arrow" aria-hidden="true">→</span></span>

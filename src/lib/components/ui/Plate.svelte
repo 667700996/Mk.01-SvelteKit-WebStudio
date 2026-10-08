@@ -35,11 +35,17 @@
 		kind,
 		caption = '',
 		index = '',
-		ratio = '4 / 3'
-	}: { kind: PlateKind; caption?: string; index?: string; ratio?: string } = $props();
+		ratio = '4 / 3',
+		name
+	}: { kind: PlateKind; caption?: string; index?: string; ratio?: string; name?: string } = $props();
 </script>
 
-<figure class="plate plate--{kind}" style:aspect-ratio={ratio} aria-hidden="true">
+<figure
+	class="plate plate--{kind}"
+	style:aspect-ratio={ratio}
+	style:view-transition-name={name}
+	aria-hidden="true"
+>
 	<svg viewBox="0 0 {W} {H}" preserveAspectRatio="xMidYMid meet">
 		{#if kind === 'orbital'}
 			<g class="ink-faint">

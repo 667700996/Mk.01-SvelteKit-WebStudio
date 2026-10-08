@@ -20,6 +20,7 @@ export const routes = [
   "/stack",
   "/open-source",
   "/contact",
+  "/colophon",
   "/privacy",
   "/terms",
 ];

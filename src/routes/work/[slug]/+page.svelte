@@ -1,5 +1,6 @@
 <script lang="ts">
-	import Plate, { plateForProject } from '$lib/components/ui/Plate.svelte';
+	import LivePlate from '$lib/components/ui/LivePlate.svelte';
+	import { plateForProject } from '$lib/components/ui/Plate.svelte';
 	import { figure, pad } from '$lib/utils/format';
 
 	let { data } = $props();
@@ -52,12 +53,14 @@
 		</nav>
 
 		<p class="kicker">{view.eyebrow}</p>
-		<h1 class="display">{project.title}</h1>
+		<h1 class="display" style:view-transition-name="title-{project.slug}">{project.title}</h1>
 		<p class="lead summary">{project.summary}</p>
 	</header>
 
-	<div class="wrap plate-host">
-		<Plate {kind} index="MK.01 / {project.slug}" caption="Generative system" ratio="16 / 9" />
+	<div class="wrap">
+		{#key project.slug}
+			<LivePlate {kind} name="plate-{project.slug}" index="MK.01 / {project.slug}" />
+		{/key}
 	</div>
 
 	<!-- Facts: the spec sheet a reviewer scans first. -->
@@ -186,7 +189,7 @@
 	<nav class="wrap section" aria-label="Next case study">
 		<a class="next plate-host" href="/work/{data.next.slug}">
 			<span class="label">Next system</span>
-			<span class="display next-title">
+			<span class="display next-title" style:view-transition-name="title-{data.next.slug}">
 				{data.next.title}<span class="arrow" aria-hidden="true">→</span>
 			</span>
 			<span class="secondary">{data.next.summary}</span>
