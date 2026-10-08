@@ -27,6 +27,10 @@
  */
 declare module '$env/static/private' {
 	export const NVM_INC: string;
+	export const CLAUDE_CODE_MESSAGING_TOKEN: string;
+	export const NoDefaultCurrentDirectoryInExePath: string;
+	export const CLAUDE_EFFORT: string;
+	export const CLAUDE_CODE_ENTRYPOINT: string;
 	export const TERM_PROGRAM: string;
 	export const NODE: string;
 	export const INIT_CWD: string;
@@ -34,6 +38,8 @@ declare module '$env/static/private' {
 	export const TERM: string;
 	export const SHELL: string;
 	export const CATALINA_HOME: string;
+	export const CLAUDE_PID: string;
+	export const CLAUDE_CODE_CHILD_SESSION: string;
 	export const HOMEBREW_REPOSITORY: string;
 	export const TMPDIR: string;
 	export const npm_config_global_prefix: string;
@@ -43,6 +49,8 @@ declare module '$env/static/private' {
 	export const TERM_SESSION_ID: string;
 	export const npm_config_noproxy: string;
 	export const npm_config_local_prefix: string;
+	export const GIT_EDITOR: string;
+	export const AI_AGENT: string;
 	export const NVM_DIR: string;
 	export const USER: string;
 	export const npm_config_globalconfig: string;
@@ -63,21 +71,28 @@ declare module '$env/static/private' {
 	export const LANG: string;
 	export const npm_config_npm_version: string;
 	export const XPC_FLAGS: string;
+	export const CLAUDE_CODE_SESSION_ATTENDED: string;
 	export const npm_config_node_gyp: string;
 	export const npm_package_version: string;
 	export const XPC_SERVICE_NAME: string;
 	export const HOME: string;
 	export const SHLVL: string;
+	export const CLAUDE_CODE_EXECPATH: string;
 	export const HOMEBREW_PREFIX: string;
 	export const npm_config_cache: string;
 	export const LOGNAME: string;
 	export const npm_lifecycle_script: string;
+	export const COREPACK_ENABLE_AUTO_PIN: string;
 	export const BUN_INSTALL: string;
 	export const NVM_BIN: string;
 	export const npm_config_user_agent: string;
+	export const CLAUDE_CODE_SESSION_ID: string;
 	export const INFOPATH: string;
 	export const HOMEBREW_CELLAR: string;
 	export const OSLogRateLimit: string;
+	export const CLAUDECODE: string;
+	export const CLAUDE_CODE_MESSAGING_SOCKET: string;
+	export const SQLITE_EXEMPT_PATH_FROM_VNODE_GUARDS: string;
 	export const npm_node_execpath: string;
 	export const npm_config_prefix: string;
 	export const COLORTERM: string;
@@ -112,6 +127,10 @@ declare module '$env/static/public' {
 declare module '$env/dynamic/private' {
 	export const env: {
 		NVM_INC: string;
+		CLAUDE_CODE_MESSAGING_TOKEN: string;
+		NoDefaultCurrentDirectoryInExePath: string;
+		CLAUDE_EFFORT: string;
+		CLAUDE_CODE_ENTRYPOINT: string;
 		TERM_PROGRAM: string;
 		NODE: string;
 		INIT_CWD: string;
@@ -119,6 +138,8 @@ declare module '$env/dynamic/private' {
 		TERM: string;
 		SHELL: string;
 		CATALINA_HOME: string;
+		CLAUDE_PID: string;
+		CLAUDE_CODE_CHILD_SESSION: string;
 		HOMEBREW_REPOSITORY: string;
 		TMPDIR: string;
 		npm_config_global_prefix: string;
@@ -128,6 +149,8 @@ declare module '$env/dynamic/private' {
 		TERM_SESSION_ID: string;
 		npm_config_noproxy: string;
 		npm_config_local_prefix: string;
+		GIT_EDITOR: string;
+		AI_AGENT: string;
 		NVM_DIR: string;
 		USER: string;
 		npm_config_globalconfig: string;
@@ -148,21 +171,28 @@ declare module '$env/dynamic/private' {
 		LANG: string;
 		npm_config_npm_version: string;
 		XPC_FLAGS: string;
+		CLAUDE_CODE_SESSION_ATTENDED: string;
 		npm_config_node_gyp: string;
 		npm_package_version: string;
 		XPC_SERVICE_NAME: string;
 		HOME: string;
 		SHLVL: string;
+		CLAUDE_CODE_EXECPATH: string;
 		HOMEBREW_PREFIX: string;
 		npm_config_cache: string;
 		LOGNAME: string;
 		npm_lifecycle_script: string;
+		COREPACK_ENABLE_AUTO_PIN: string;
 		BUN_INSTALL: string;
 		NVM_BIN: string;
 		npm_config_user_agent: string;
+		CLAUDE_CODE_SESSION_ID: string;
 		INFOPATH: string;
 		HOMEBREW_CELLAR: string;
 		OSLogRateLimit: string;
+		CLAUDECODE: string;
+		CLAUDE_CODE_MESSAGING_SOCKET: string;
+		SQLITE_EXEMPT_PATH_FROM_VNODE_GUARDS: string;
 		npm_node_execpath: string;
 		npm_config_prefix: string;
 		COLORTERM: string;
