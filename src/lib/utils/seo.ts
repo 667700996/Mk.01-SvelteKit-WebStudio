@@ -37,7 +37,7 @@ export function buildSeo(options: SeoInput = {}): SeoResult {
     title,
     description = siteConfig.description,
     path = "/",
-    image,
+    image = "/og.png",
     noindex = false,
     type = "website",
     tags = [],
@@ -69,6 +69,13 @@ export function buildSeo(options: SeoInput = {}): SeoResult {
 
   if (ogImage) {
     openGraph.push({ property: "og:image", content: ogImage });
+    if (ogImage === absoluteUrl("/og.png")) {
+      openGraph.push(
+        { property: "og:image:width", content: "1200" },
+        { property: "og:image:height", content: "630" },
+        { property: "og:image:alt", content: "MK.01 — Digital matter, engineered." },
+      );
+    }
   }
 
   if (openGraphType === "article") {
@@ -133,7 +140,7 @@ export function buildSeo(options: SeoInput = {}): SeoResult {
         name: siteConfig.name,
         logo: {
           "@type": "ImageObject",
-          url: ogImage ?? absoluteUrl("/favicon.png"),
+          url: ogImage ?? absoluteUrl("/favicon.svg"),
         },
       },
       mainEntityOfPage: {

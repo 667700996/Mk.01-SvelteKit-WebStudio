@@ -1,100 +1,140 @@
 <script lang="ts">
-	const links = [
-		{ title: 'Work', href: '/work' },
-		{ title: 'Labs', href: '/labs' },
-		{ title: 'About', href: '/about' },
-		{ title: 'Contact', href: '/contact' }
-	];
+	import { footerNav } from '$config/navigation.config';
+	import { siteConfig } from '$lib/config/site';
+	import Kbd from '$lib/components/ui/Kbd.svelte';
+	import LocalTime from '$lib/components/ui/LocalTime.svelte';
+	import ThemeSwitch from '$lib/components/ui/ThemeSwitch.svelte';
 </script>
 
-<footer class="site-footer">
-	<div class="site-footer__top">
-		<a href="/" class="site-footer__brand">MK.01</a>
-		<p>Independent design engineering practice.<br />Seoul / Global.</p>
-	</div>
-	<div class="site-footer__bottom">
-		<nav aria-label="Footer navigation">
-			{#each links as link}
-				<a href={link.href}>{link.title}</a>
+<footer class="footer">
+	<div class="wrap">
+		<div class="grid top">
+			<div class="intro">
+				<a class="brand" href="/">MK.01</a>
+				<p class="secondary">
+					Independent design engineering practice.<br />Seoul, working globally.
+				</p>
+				<a class="link email" href="mailto:{siteConfig.contactEmail}">{siteConfig.contactEmail}</a>
+			</div>
+
+			{#each footerNav as group (group.title)}
+				<nav class="column" aria-labelledby="footer-{group.title}">
+					<h2 class="label" id="footer-{group.title}">{group.title}</h2>
+					<ul role="list">
+						{#each group.links as link (link.href)}
+							<li><a href={link.href}>{link.label}</a></li>
+						{/each}
+					</ul>
+				</nav>
 			{/each}
-		</nav>
-		<a href="mailto:studio@mk1.dev">studio@mk1.dev ↗</a>
-		<span>© 2026</span>
+		</div>
+
+		<div class="bottom">
+			<p class="label">© 2026 MK.01</p>
+			<p class="label">Seoul <LocalTime /></p>
+			<p class="label shortcuts">
+				<Kbd keys={['mod', 'K']} /> Search <Kbd keys={['G']} /> Grid
+			</p>
+			<ThemeSwitch />
+		</div>
 	</div>
 </footer>
 
 <style>
-	.site-footer {
-		padding: 100px clamp(18px, 3vw, 50px) 28px;
-		border-top: 1px solid rgba(240, 240, 232, 0.14);
-		background: #080907;
-		color: #f0f0e8;
+	.footer {
+		border-top: var(--hairline) solid var(--line);
+		padding-block: var(--space-9) var(--space-6);
+		font-size: var(--text-small);
 	}
 
-	.site-footer__top {
+	.top {
+		row-gap: var(--space-7);
+		padding-bottom: var(--space-9);
+	}
+
+	.intro {
+		grid-column: 1 / span 6;
 		display: flex;
-		align-items: flex-end;
-		justify-content: space-between;
-		margin-bottom: 100px;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: var(--space-4);
 	}
 
-	.site-footer__brand {
-		color: inherit;
-		font-family: 'Syne', sans-serif;
-		font-size: clamp(76px, 14vw, 220px);
-		font-weight: 700;
-		letter-spacing: -0.09em;
-		line-height: 0.75;
+	.brand {
+		font-size: 1.375rem;
+		font-weight: 680;
+		letter-spacing: -0.04em;
 	}
 
-	.site-footer__top p {
-		margin: 0;
-		color: rgba(240, 240, 232, 0.45);
-		font-family: 'JetBrains Mono', monospace;
-		font-size: 9px;
-		letter-spacing: 0.07em;
-		line-height: 1.6;
-		text-transform: uppercase;
+	.email {
+		margin-top: var(--space-2);
 	}
 
-	.site-footer__bottom {
-		display: grid;
-		grid-template-columns: 1fr 1fr auto;
-		gap: 40px;
-		border-top: 1px solid rgba(240, 240, 232, 0.14);
-		padding-top: 20px;
-		font-family: 'JetBrains Mono', monospace;
-		font-size: 8px;
-		letter-spacing: 0.08em;
-		text-transform: uppercase;
+	.column {
+		grid-column: span 2;
 	}
 
-	.site-footer nav {
+	.column h2 {
+		margin-bottom: var(--space-4);
+	}
+
+	.column li + li {
+		margin-top: var(--space-2);
+	}
+
+	.column a {
+		color: var(--fg-2);
+		transition: color var(--duration-2) var(--ease-out);
+	}
+
+	.column a:hover {
+		color: var(--fg);
+	}
+
+	.bottom {
 		display: flex;
-		gap: 22px;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: var(--space-4) var(--space-6);
+		padding-top: var(--space-5);
+		border-top: var(--hairline) solid var(--line);
 	}
 
-	.site-footer a {
-		color: rgba(240, 240, 232, 0.7);
+	.bottom > :global(fieldset) {
+		margin-left: auto;
 	}
 
-	.site-footer a:hover {
-		color: #d7ff55;
+	.shortcuts {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-2);
 	}
 
-	@media (max-width: 650px) {
-		.site-footer__top {
-			align-items: flex-start;
-			flex-direction: column;
-			gap: 40px;
+	.shortcuts :global(kbd:not(:first-child)) {
+		margin-left: var(--space-3);
+	}
+
+	@media (max-width: 63.99rem) {
+		.intro {
+			grid-column: 1 / -1;
 		}
 
-		.site-footer__bottom {
-			grid-template-columns: 1fr auto;
+		.column {
+			grid-column: span 4;
+		}
+	}
+
+	@media (max-width: 47.99rem) {
+		.column {
+			grid-column: span 6;
 		}
 
-		.site-footer__bottom > a {
-			grid-row: 2;
+		.shortcuts {
+			display: none;
+		}
+
+		.bottom > :global(fieldset) {
+			margin-left: 0;
 		}
 	}
 </style>
