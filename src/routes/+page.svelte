@@ -1,11 +1,21 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import SignalArtifact from '$lib/components/3d/SignalArtifact.svelte';
-	import FieldConsole from '$lib/components/experience/FieldConsole.svelte';
-	import SystemLedger from '$lib/components/experience/SystemLedger.svelte';
-	import '../styles/home.css';
+	import { siteConfig } from '$lib/config/site';
+	import EngineeringRecord from '$lib/components/home/EngineeringRecord.svelte';
+	import SignalField from '$lib/components/home/SignalField.svelte';
+	import LocalTime from '$lib/components/ui/LocalTime.svelte';
+	import Plate, { type PlateKind } from '$lib/components/ui/Plate.svelte';
+	import SectionHead from '$lib/components/ui/SectionHead.svelte';
 
-	const projects = [
+	const projects: {
+		index: string;
+		title: string;
+		slug: string;
+		discipline: string;
+		statement: string;
+		metric: string;
+		metricLabel: string;
+		type: PlateKind;
+	}[] = [
 		{
 			index: '01',
 			title: 'Kinesis',
@@ -40,299 +50,624 @@
 
 	const disciplines = [
 		{
-			index: '01',
 			title: 'Direction',
 			copy: 'Positioning, visual systems, and a singular idea strong enough to govern every decision.'
 		},
 		{
-			index: '02',
 			title: 'Experience',
 			copy: 'Narrative UX, interaction choreography, and motion with an editorial sense of timing.'
 		},
 		{
-			index: '03',
 			title: 'Technology',
 			copy: 'Svelte, shaders, WebGL, creative coding, and performant systems built for the real world.'
 		},
 		{
-			index: '04',
 			title: 'Launch',
 			copy: 'Production, accessibility, measurement, and the last ten percent that people remember.'
 		}
 	];
 
-	let activeProject = 0;
-	let currentTime = '';
-
-	onMount(() => {
-		document.body.classList.add('mk-home-active');
-
-		const formatTime = () => {
-			currentTime = new Intl.DateTimeFormat('en-GB', {
-				hour: '2-digit',
-				minute: '2-digit',
-				second: '2-digit',
-				hour12: false,
-				timeZone: 'Asia/Seoul'
-			}).format(new Date());
-		};
-		formatTime();
-		const clockTimer = window.setInterval(formatTime, 1000);
-
-		const revealObserver = new IntersectionObserver(
-			(entries) => {
-				entries.forEach((entry) => {
-					if (entry.isIntersecting) {
-						entry.target.classList.add('is-visible');
-						revealObserver.unobserve(entry.target);
-					}
-				});
-			},
-			{ threshold: 0.14, rootMargin: '0px 0px -8% 0px' }
-		);
-		document.querySelectorAll('[data-reveal]').forEach((element) => revealObserver.observe(element));
-
-		const projectObserver = new IntersectionObserver(
-			(entries) => {
-				const visibleEntry = entries
-					.filter((entry) => entry.isIntersecting)
-					.sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-				if (visibleEntry) {
-					activeProject = Number((visibleEntry.target as HTMLElement).dataset.projectIndex ?? 0);
-				}
-			},
-			{ threshold: [0.25, 0.5, 0.72], rootMargin: '-18% 0px -18% 0px' }
-		);
-		document
-			.querySelectorAll<HTMLElement>('[data-project-index]')
-			.forEach((element) => projectObserver.observe(element));
-
-		return () => {
-			document.body.classList.remove('mk-home-active');
-			window.clearInterval(clockTimer);
-			revealObserver.disconnect();
-			projectObserver.disconnect();
-		};
-	});
+	const practice = ['Strategy', 'Interaction', 'WebGL', 'Motion', 'Systems'];
 </script>
 
-<svelte:head>
-	<meta name="theme-color" content="#080907" />
-</svelte:head>
+<!-- Hero ------------------------------------------------------------------>
+<section class="hero" aria-labelledby="hero-title">
+	<div class="hero-columns wrap grid" aria-hidden="true">
+		{#each { length: 12 } as _, i}
+			<span style:--i={i}></span>
+		{/each}
+	</div>
 
-<article class="home">
-	<section class="hero" aria-labelledby="hero-title">
-		<div class="hero__grid" aria-hidden="true"></div>
-		<div class="hero__artifact">
-			<SignalArtifact />
+	<div class="wrap hero-inner">
+		<div class="grid hero-meta label">
+			<p>Creative technologist × Product engineer</p>
+			<p>Seoul / Global — 37.5665° N, 126.9780° E</p>
+			<p>Portfolio / Selected systems</p>
 		</div>
 
-		<div class="hero__meta hero__meta--left">
-			<span>Creative technologist × product engineer</span>
-			<span>Seoul / Global</span>
-		</div>
-		<div class="hero__meta hero__meta--right">
-			<span>Portfolio / Selected systems</span>
-			<span>Design × Motion × Code</span>
-		</div>
-
-		<div class="hero__headline">
-			<p class="hero__kicker">We make technology feel inevitable.</p>
-			<h1 id="hero-title">
-				<span class="hero__line hero__line--one">Digital</span>
-				<span class="hero__line hero__line--two">matter,</span>
-				<span class="hero__line hero__line--three">engineered.</span>
+		<div class="hero-title">
+			<p class="kicker">We make technology feel inevitable.</p>
+			<h1 id="hero-title" class="display">
+				<span class="line"><span>Digital matter,</span></span>
+				<span class="line"><span>engineered<em>.</em></span></span>
 			</h1>
 		</div>
 
-		<div class="hero__footer">
-			<p>
+		<div class="grid hero-foot">
+			<p class="lead">
 				MK.01 is the practice of a design engineer building digital products, identities, and
 				interactive systems where concept and code become one material.
 			</p>
-			<a class="text-link" href="#work">Explore selected work <span>↓</span></a>
+			<a class="cta" href="#work">
+				Explore selected work <span class="arrow arrow--down" aria-hidden="true">↓</span>
+			</a>
 		</div>
+	</div>
+</section>
 
-		<div class="hero__coordinates" aria-hidden="true">
-			<span>37.5665° N</span>
-			<span>126.9780° E</span>
-		</div>
-	</section>
-
-	<section class="manifesto section-pad" aria-labelledby="manifesto-title">
-		<div class="section-index" data-reveal>
-			<span>( 00 )</span>
-			<span>Manifesto</span>
-		</div>
-		<div class="manifesto__statement" data-reveal>
-			<h2 id="manifesto-title">
-				The screen is not a canvas.
-				<span>It is a material.</span>
+<!-- Manifesto ------------------------------------------------------------->
+<section class="section wrap manifesto" aria-labelledby="manifesto-title">
+	<div class="grid">
+		<p class="label meta" data-reveal><span>00</span><span>Manifesto</span></p>
+		<div class="statement">
+			<h2 id="manifesto-title" class="h1" data-reveal>
+				The screen is not a canvas. <span class="muted">It is a material.</span>
 			</h2>
-			<div class="manifesto__support">
-				<p>
-					Strategy, interface, motion, and engineering are treated as one continuous practice.
-					Every behavior earns its place; every frame has a job.
+			<div class="support" data-reveal>
+				<p class="lead">
+					Strategy, interface, motion, and engineering are treated as one continuous practice. Every
+					behavior earns its place; every frame has a job.
 				</p>
-				<p class="mono-copy">
-					The work must earn attention,<br />
-					reward curiosity, and survive reality.
-				</p>
-			</div>
-		</div>
-		<div class="manifesto__ticker" aria-hidden="true">
-			<div>
-				<span>Strategy</span><i>✦</i><span>Interaction</span><i>✦</i><span>WebGL</span><i>✦</i
-				><span>Motion</span><i>✦</i><span>Systems</span><i>✦</i><span>Strategy</span><i>✦</i
-				><span>Interaction</span><i>✦</i><span>WebGL</span><i>✦</i>
-			</div>
-		</div>
-	</section>
-
-	<section class="work section-pad" id="work" aria-labelledby="work-title">
-		<header class="work__header" data-reveal>
-			<div class="section-index">
-				<span>( 01—03 )</span>
-				<span>Selected work</span>
-			</div>
-			<h2 id="work-title">Built to be<br />felt, not scrolled past.</h2>
-			<p>Three systems where concept, craft, and computation became inseparable.</p>
-		</header>
-
-		<div class="work__sequence">
-			<div class="work__stage">
-				<div class="work__visual" aria-hidden="true">
-					{#each projects as project, index}
-						<div
-							class:active={activeProject === index}
-							class="project-art project-art--{project.type}"
-						>
-							{#if project.type === 'orbital'}
-								<div class="orbital__core"></div>
-								<div class="orbital__ring orbital__ring--a"></div>
-								<div class="orbital__ring orbital__ring--b"></div>
-								<div class="orbital__ring orbital__ring--c"></div>
-							{:else if project.type === 'signal'}
-								<div class="signal__beam"></div>
-								<div class="signal__disc"></div>
-								<div class="signal__grid"></div>
-							{:else}
-								<div class="monolith__block monolith__block--a"></div>
-								<div class="monolith__block monolith__block--b"></div>
-								<div class="monolith__type">R</div>
-							{/if}
-							<div class="project-art__label">
-								<span>MK / CASE {project.index}</span>
-								<span>LIVE SYSTEM</span>
-							</div>
-						</div>
-					{/each}
-				</div>
-				<div class="work__stage-counter" aria-hidden="true">
-					<span>0{activeProject + 1}</span>
-					<i></i>
-					<span>03</span>
-				</div>
-			</div>
-
-			<div class="work__list">
-				{#each projects as project, index}
-					<a
-						href="/work/{project.slug}"
-						class:active={activeProject === index}
-						class="project-row"
-						data-project-index={index}
-					>
-						<div class="project-row__top">
-							<span class="project-row__index">{project.index}</span>
-							<span class="project-row__discipline">{project.discipline}</span>
-							<span class="project-row__arrow">↗</span>
-						</div>
-						<h3>{project.title}</h3>
-						<p>{project.statement}</p>
-						<div class="project-row__metric">
-							<strong>{project.metric}</strong>
-							<span>{project.metricLabel}</span>
-						</div>
-					</a>
-				{/each}
-			</div>
-		</div>
-	</section>
-
-	<section class="lab section-pad" id="lab" aria-labelledby="lab-title">
-		<header class="lab__header" data-reveal>
-			<div class="section-index">
-				<span>( 04 )</span>
-				<span>Live experiment</span>
-			</div>
-			<div>
-				<h2 id="lab-title">Touch the<br />signal field.</h2>
-				<p>
-					A real-time kinetic system. Move through the field and hold to reverse its polarity.
-					No video. No illusion. Just the browser.
+				<p class="label">
+					The work must earn attention,<br />reward curiosity, and survive reality.
 				</p>
 			</div>
-		</header>
-		<div class="lab__console" data-reveal>
-			<FieldConsole />
-			<div class="lab__caption">
-				<span>Experiment 08 / Elastic topology</span>
-				<span>Pointer, touch, reduced-motion aware</span>
-			</div>
 		</div>
-	</section>
+	</div>
 
-	<SystemLedger />
+	<ol class="practice" role="list" aria-label="Practice" data-reveal>
+		{#each practice as item, index}
+			<li><span class="label">0{index + 1}</span>{item}</li>
+		{/each}
+	</ol>
+</section>
 
-	<section class="method section-pad" id="method" aria-labelledby="method-title">
-		<div class="method__intro" data-reveal>
-			<div class="section-index">
-				<span>( 06 )</span>
-				<span>One continuous practice</span>
-			</div>
-			<h2 id="method-title">Thinking and making<br />belong in the same room.</h2>
+<!-- Selected work --------------------------------------------------------->
+<section class="section wrap work" id="work" aria-labelledby="work-title">
+	<SectionHead
+		index="01—03"
+		label="Selected work"
+		title="Built to be felt, not scrolled past."
+		intro="Three systems where concept, craft, and computation became inseparable."
+		id="work-title"
+	/>
+
+	<ol class="projects" role="list">
+		{#each projects as project (project.slug)}
+			<li>
+				<a class="project grid plate-host" href="/work/{project.slug}" data-reveal>
+					<div class="project-plate">
+						<Plate kind={project.type} index="MK / Case {project.index}" caption="Live system" />
+					</div>
+					<div class="project-info">
+						<p class="label project-meta">
+							<span>{project.index}</span>
+							<span>{project.discipline}</span>
+						</p>
+						<h3 class="h2">{project.title}</h3>
+						<p class="secondary project-statement">{project.statement}</p>
+						<p class="metric">
+							<strong class="h3 tabular">{project.metric}</strong>
+							<span class="label">{project.metricLabel}</span>
+						</p>
+						<span class="open">
+							View case study <span class="arrow" aria-hidden="true">→</span>
+						</span>
+					</div>
+				</a>
+			</li>
+		{/each}
+	</ol>
+</section>
+
+<!-- Live experiment ------------------------------------------------------->
+<section class="section wrap lab" id="lab" aria-labelledby="lab-title">
+	<SectionHead
+		index="04"
+		label="Live experiment"
+		title="Touch the signal field."
+		intro="A real-time kinetic system. Move through the field and hold to reverse its polarity. No video. No illusion. Just the browser."
+		id="lab-title"
+	/>
+	<div data-reveal>
+		<SignalField />
+		<div class="caption label">
+			<span>Experiment 08 / Elastic topology</span>
+			<span>Pointer, touch, keyboard, reduced-motion aware</span>
 		</div>
+	</div>
+</section>
 
-		<div class="method__list">
-			{#each disciplines as discipline}
-				<article class="method-row" data-reveal>
-					<span class="method-row__index">{discipline.index}</span>
-					<h3>{discipline.title}</h3>
-					<p>{discipline.copy}</p>
-					<span class="method-row__glyph" aria-hidden="true">+</span>
-				</article>
-			{/each}
-		</div>
+<EngineeringRecord />
 
-		<div class="method__principle" data-reveal>
-			<p class="mono-copy">The Mk.01 principle</p>
-			<p>
-				Use less technology.<br />
-				Make it matter more.
-			</p>
-		</div>
-	</section>
+<!-- Method ---------------------------------------------------------------->
+<section class="section wrap method" id="method" aria-labelledby="method-title">
+	<SectionHead
+		index="06"
+		label="One continuous practice"
+		title="Thinking and making belong in the same room."
+		id="method-title"
+	/>
 
-	<section class="contact" id="contact" aria-labelledby="contact-title">
-		<div class="contact__noise" aria-hidden="true"></div>
-		<div class="contact__meta">
-			<span>Building something that should feel inevitable?</span>
-			<span>Open to exceptional teams and selected commissions / 2026</span>
+	<ol class="disciplines" role="list">
+		{#each disciplines as discipline, index}
+			<li data-reveal>
+				<span class="label">0{index + 1}</span>
+				<h3 class="h4">{discipline.title}</h3>
+				<p class="secondary">{discipline.copy}</p>
+			</li>
+		{/each}
+	</ol>
+
+	<figure class="grid principle" data-reveal>
+		<figcaption class="label">The Mk.01 principle</figcaption>
+		<blockquote class="h1">
+			<p>Use less technology.<br /><span class="muted">Make it matter more.</span></p>
+		</blockquote>
+	</figure>
+</section>
+
+<!-- Contact --------------------------------------------------------------->
+<section class="contact" id="contact" aria-labelledby="contact-title">
+	<div class="wrap">
+		<div class="grid contact-meta label">
+			<p>Building something that should feel inevitable?</p>
+			<p>Open to exceptional teams and selected commissions / 2026</p>
 		</div>
-		<h2 id="contact-title">
-			<a href="mailto:studio@mk1.dev?subject=New%20project%20with%20Mk.01">
-				<span>Make it</span>
-				<span>matter.</span>
-				<i aria-hidden="true">↗</i>
+		<h2 id="contact-title" class="display contact-title">
+			<a href="mailto:{siteConfig.contactEmail}?subject=New%20project%20with%20Mk.01">
+				Make it matter.<span class="arrow arrow--diagonal" aria-hidden="true">↗</span>
 			</a>
 		</h2>
-		<div class="contact__footer">
-			<a href="mailto:studio@mk1.dev">studio@mk1.dev</a>
-			<div>
-				<span>Seoul {currentTime} KST</span>
-				<span>© 2026 MK.01</span>
-			</div>
+		<div class="contact-foot">
+			<a class="link" href="mailto:{siteConfig.contactEmail}">{siteConfig.contactEmail}</a>
+			<p class="label">Seoul <LocalTime /></p>
 		</div>
-	</section>
-</article>
+	</div>
+</section>
+
+<style>
+	/* Hero ----------------------------------------------------------------- */
+
+	.hero {
+		position: relative;
+		min-height: calc(100svh - var(--nav-height));
+		display: flex;
+		overflow: hidden;
+	}
+
+	.hero-columns {
+		position: absolute;
+		inset: 0;
+		left: 50%;
+		translate: -50% 0;
+		pointer-events: none;
+	}
+
+	.hero-columns span {
+		border-left: var(--hairline) solid color-mix(in oklab, var(--line) 70%, transparent);
+		transform-origin: top;
+		animation: column-in 1.2s var(--ease-out) both;
+		animation-delay: calc(var(--i) * 40ms);
+		mask-image: linear-gradient(to bottom, #000 0%, transparent 92%);
+	}
+
+	.hero-columns span:last-child {
+		border-right: var(--hairline) solid color-mix(in oklab, var(--line) 70%, transparent);
+	}
+
+	.hero-title h1 {
+		font-size: clamp(3.25rem, 0.9rem + 11.6vw, 13.5rem);
+	}
+
+	@keyframes column-in {
+		from {
+			transform: scaleY(0);
+		}
+	}
+
+	.hero-inner {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		gap: var(--space-8);
+		padding-block: var(--space-6) var(--space-7);
+	}
+
+	.hero-meta p {
+		grid-column: span 4;
+	}
+
+	.hero-meta p:last-child {
+		text-align: right;
+	}
+
+	.kicker {
+		margin-bottom: var(--space-5);
+		color: var(--fg-2);
+		font-size: var(--text-lead);
+		letter-spacing: -0.016em;
+		animation: rise var(--duration-4) var(--ease-out) 0.25s both;
+	}
+
+	h1 .line {
+		display: block;
+		overflow: hidden;
+		/* Room for descenders inside the mask. */
+		padding-bottom: 0.06em;
+		margin-bottom: -0.06em;
+	}
+
+	h1 .line > span {
+		display: block;
+		animation: line-in 1.1s var(--ease-out) both;
+	}
+
+	h1 .line:nth-child(2) > span {
+		animation-delay: 90ms;
+	}
+
+	h1 em {
+		font-style: normal;
+		color: var(--accent);
+	}
+
+	@keyframes line-in {
+		from {
+			transform: translateY(105%);
+		}
+	}
+
+	@keyframes rise {
+		from {
+			opacity: 0;
+			transform: translateY(0.75rem);
+		}
+	}
+
+	.hero-foot {
+		align-items: end;
+		row-gap: var(--space-5);
+		padding-top: var(--space-5);
+		border-top: var(--hairline) solid var(--line);
+		animation: rise var(--duration-4) var(--ease-out) 0.4s both;
+	}
+
+	.hero-foot .lead {
+		grid-column: 1 / span 6;
+		max-width: 30em;
+	}
+
+	.cta {
+		grid-column: 10 / -1;
+		justify-self: end;
+		font-weight: 520;
+	}
+
+	/* Manifesto ------------------------------------------------------------ */
+
+	.meta {
+		grid-column: 1 / span 3;
+		display: flex;
+		gap: var(--space-4);
+		padding-top: 0.75em;
+	}
+
+	.statement {
+		grid-column: 4 / -1;
+	}
+
+	.statement h2 {
+		max-width: 14ch;
+	}
+
+	.support {
+		display: grid;
+		grid-template-columns: 2fr 1fr;
+		gap: var(--gutter);
+		align-items: end;
+		margin-top: var(--space-8);
+	}
+
+	.practice {
+		display: grid;
+		grid-template-columns: repeat(5, 1fr);
+		margin-top: var(--space-10);
+		border-top: var(--hairline) solid var(--line);
+		border-bottom: var(--hairline) solid var(--line);
+	}
+
+	.practice li {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-3);
+		padding: var(--space-5) var(--space-4);
+		font-size: var(--text-h4);
+		font-weight: 560;
+		letter-spacing: -0.02em;
+	}
+
+	.practice li:first-child {
+		padding-left: 0;
+	}
+
+	.practice li + li {
+		border-left: var(--hairline) solid var(--line);
+	}
+
+	/* Work ----------------------------------------------------------------- */
+
+	.projects {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-9);
+	}
+
+	.project {
+		align-items: stretch;
+		row-gap: var(--space-6);
+	}
+
+	.project-plate {
+		grid-column: 1 / span 7;
+	}
+
+	.project-plate :global(.plate) {
+		transition: transform var(--duration-4) var(--ease-out);
+	}
+
+	.project:hover .project-plate :global(.plate) {
+		transform: scale(0.992);
+	}
+
+	.project-info {
+		grid-column: 9 / -1;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.project-meta {
+		display: flex;
+		gap: var(--space-4);
+		padding-bottom: var(--space-5);
+		margin-bottom: var(--space-6);
+		border-bottom: var(--hairline) solid var(--line);
+	}
+
+	.project-statement {
+		max-width: 24em;
+		margin-top: var(--space-4);
+		font-size: var(--text-lead);
+		letter-spacing: -0.016em;
+		line-height: 1.4;
+	}
+
+	.metric {
+		display: flex;
+		align-items: baseline;
+		gap: var(--space-3);
+		margin-top: auto;
+		padding-top: var(--space-7);
+	}
+
+	.open {
+		margin-top: var(--space-5);
+		padding-top: var(--space-4);
+		border-top: var(--hairline) solid var(--line);
+		font-weight: 520;
+	}
+
+	.project:hover .open {
+		color: var(--accent);
+	}
+
+	/* Lab ------------------------------------------------------------------ */
+
+	.caption {
+		display: flex;
+		justify-content: space-between;
+		gap: var(--space-4);
+		margin-top: var(--space-4);
+	}
+
+	/* Method --------------------------------------------------------------- */
+
+	.disciplines {
+		display: grid;
+		grid-template-columns: repeat(4, 1fr);
+		gap: var(--gutter);
+	}
+
+	.disciplines li {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-3);
+		padding-top: var(--space-5);
+		border-top: var(--hairline) solid var(--fg);
+	}
+
+	.disciplines h3 {
+		margin-top: var(--space-6);
+	}
+
+	.principle {
+		margin-top: var(--section);
+	}
+
+	.principle figcaption {
+		grid-column: 1 / span 3;
+		padding-top: 0.75em;
+	}
+
+	.principle blockquote {
+		grid-column: 4 / -1;
+	}
+
+	/* Contact -------------------------------------------------------------- */
+
+	.contact {
+		margin-top: var(--section);
+		padding-block: var(--space-9) var(--space-8);
+		border-top: var(--hairline) solid var(--line);
+	}
+
+	.contact-meta p:first-child {
+		grid-column: 1 / span 6;
+	}
+
+	.contact-meta p:last-child {
+		grid-column: 7 / -1;
+		text-align: right;
+	}
+
+	.contact-title {
+		margin-block: var(--space-8);
+	}
+
+	.contact-title a {
+		display: inline-flex;
+		align-items: flex-start;
+		gap: 0.08em;
+		transition: color var(--duration-3) var(--ease-out);
+	}
+
+	.contact-title a:hover {
+		color: var(--accent);
+	}
+
+	.contact-title .arrow {
+		font-size: 0.45em;
+		font-weight: 400;
+		margin-top: 0.12em;
+	}
+
+	.contact-foot {
+		display: flex;
+		justify-content: space-between;
+		align-items: baseline;
+		gap: var(--space-4);
+		font-size: var(--text-lead);
+	}
+
+	/* Responsive ----------------------------------------------------------- */
+
+	@media (max-width: 63.99rem) {
+		.hero-meta p {
+			grid-column: span 6;
+		}
+
+		.hero-meta p:nth-child(2) {
+			display: none;
+		}
+
+		.meta,
+		.statement,
+		.principle figcaption,
+		.principle blockquote {
+			grid-column: 1 / -1;
+		}
+
+		.statement {
+			margin-top: var(--space-5);
+		}
+
+		.principle blockquote {
+			margin-top: var(--space-5);
+		}
+
+		.project-plate,
+		.project-info {
+			grid-column: 1 / -1;
+		}
+
+		.metric {
+			padding-top: var(--space-6);
+		}
+
+		.disciplines {
+			grid-template-columns: repeat(2, 1fr);
+			row-gap: var(--space-7);
+		}
+	}
+
+	@media (max-width: 47.99rem) {
+		.hero-columns {
+			grid-template-columns: repeat(4, minmax(0, 1fr));
+		}
+
+		.hero-columns span:nth-child(n + 5) {
+			display: none;
+		}
+
+		.hero-columns span:nth-child(4) {
+			border-right: var(--hairline) solid color-mix(in oklab, var(--line) 70%, transparent);
+		}
+
+		.hero-meta p:first-child {
+			grid-column: 1 / -1;
+		}
+
+		.hero-meta p:last-child {
+			display: none;
+		}
+
+		.hero-foot .lead,
+		.cta {
+			grid-column: 1 / -1;
+			justify-self: start;
+		}
+
+		.support {
+			grid-template-columns: 1fr;
+		}
+
+		.practice {
+			grid-template-columns: 1fr;
+		}
+
+		.practice li {
+			flex-direction: row;
+			align-items: baseline;
+			padding: var(--space-4) 0;
+		}
+
+		.practice li + li {
+			border-left: 0;
+			border-top: var(--hairline) solid var(--line);
+		}
+
+		.disciplines {
+			grid-template-columns: 1fr;
+		}
+
+		.caption {
+			flex-direction: column;
+			gap: var(--space-1);
+		}
+
+		.contact-meta p:first-child,
+		.contact-meta p:last-child {
+			grid-column: 1 / -1;
+			text-align: left;
+		}
+
+		.contact-meta p:last-child {
+			margin-top: var(--space-2);
+		}
+
+		.contact-foot {
+			flex-direction: column;
+		}
+	}
+</style>

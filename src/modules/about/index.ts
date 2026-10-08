@@ -1,7 +1,7 @@
+/** Portraits are rendered as typographic monograms; no image assets required. */
 export interface TeamMember {
   name: string;
   title: string;
-  avatar: string;
   location: string;
   specialties: string[];
 }
@@ -16,28 +16,24 @@ export const team: TeamMember[] = [
   {
     name: "이준호",
     title: "Founder · Creative Technologist",
-    avatar: "/images/team/junho.jpg",
     location: "Seoul, KR",
     specialties: ["Experience Engineering", "3D Web", "Motion Systems"],
   },
   {
     name: "Mira Park",
     title: "Design Director",
-    avatar: "/images/team/mira.jpg",
     location: "Busan, KR",
     specialties: ["Narrative UX", "Design Systems", "Accessibility"],
   },
   {
     name: "Ethan Cho",
     title: "Head of Labs",
-    avatar: "/images/team/ethan.jpg",
     location: "Tokyo, JP",
     specialties: ["Creative R&D", "Realtime Collaboration", "AI Prototyping"],
   },
   {
     name: "Sara Min",
     title: "Lead Product Engineer",
-    avatar: "/images/team/sara.jpg",
     location: "Seoul, KR",
     specialties: ["Svelte Architecture", "Edge Compute", "Tooling"],
   },

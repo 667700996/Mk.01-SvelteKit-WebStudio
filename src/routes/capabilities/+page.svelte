@@ -1,5 +1,7 @@
 <script lang="ts">
-	import PageSection from '$lib/components/ui/PageSection.svelte';
+	import CtaBand from '$lib/components/ui/CtaBand.svelte';
+	import PageHeader from '$lib/components/ui/PageHeader.svelte';
+	import { pad } from '$lib/utils/format';
 
 	const capabilitySets = [
 		{
@@ -21,33 +23,70 @@
 	];
 </script>
 
-<PageSection id="capabilities-hero" tone="contrast" padding="xl">
-	<div class="space-y-6 text-center">
-		<span class="eyebrow text-secondary/80">Capabilities</span>
-		<h1 class="mx-auto max-w-4xl text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
-			A full-stack studio blending strategy, design, motion, and engineering.
-		</h1>
-		<p class="mx-auto max-w-3xl text-base text-base-content/70 sm:text-lg">
-			Our engagements flex to your stage: discovery sprints, product redesigns, launch campaigns,
-			and experimentation programs.
-		</p>
-	</div>
-</PageSection>
+<PageHeader
+	label="Capabilities"
+	title="A full-stack studio blending strategy, design, motion, and engineering."
+	lead="Our engagements flex to your stage: discovery sprints, product redesigns, launch campaigns, and experimentation programs."
+/>
 
-<PageSection id="capability-grid">
-	<div class="grid gap-6 md:grid-cols-2">
-		{#each capabilitySets as set}
-			<div class="surface-card h-full">
-				<h2 class="text-xl font-semibold text-base-content">{set.title}</h2>
-				<ul class="mt-4 space-y-2 text-sm text-base-content/70">
-					{#each set.items as item}
-						<li class="flex items-start gap-2">
-							<span class="mt-[6px] inline-flex h-1.5 w-1.5 rounded-full bg-primary/60"></span>
-							<span>{item}</span>
-						</li>
-					{/each}
-				</ul>
-			</div>
-		{/each}
-	</div>
-</PageSection>
+<section class="wrap matrix" aria-label="Capability matrix">
+	{#each capabilitySets as set, index (set.title)}
+		<div class="column" data-reveal>
+			<p class="label">{pad(index + 1)}</p>
+			<h2 class="h4">{set.title}</h2>
+			<ul role="list">
+				{#each set.items as item (item)}
+					<li>{item}</li>
+				{/each}
+			</ul>
+		</div>
+	{/each}
+</section>
+
+<CtaBand title="Shape the engagement around the problem.">
+	{#snippet actions()}
+		<a class="button" href="/services">See engagement models</a>
+		<a class="button button--quiet" href="/contact">Start a project</a>
+	{/snippet}
+</CtaBand>
+
+<style>
+	.matrix {
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		column-gap: var(--gutter);
+		row-gap: var(--space-8);
+	}
+
+	.column {
+		padding-top: var(--space-5);
+		border-top: var(--hairline) solid var(--fg);
+	}
+
+	h2 {
+		margin-block: var(--space-6) var(--space-5);
+		min-height: 2.5em;
+	}
+
+	li {
+		padding-block: var(--space-3);
+		border-top: var(--hairline) solid var(--line);
+		color: var(--fg-2);
+	}
+
+	@media (max-width: 63.99rem) {
+		.matrix {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+
+	@media (max-width: 47.99rem) {
+		.matrix {
+			grid-template-columns: 1fr;
+		}
+
+		h2 {
+			min-height: 0;
+		}
+	}
+</style>

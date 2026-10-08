@@ -1,5 +1,8 @@
 <script lang="ts">
-	import PageSection from '$lib/components/ui/PageSection.svelte';
+	import CtaBand from '$lib/components/ui/CtaBand.svelte';
+	import PageHeader from '$lib/components/ui/PageHeader.svelte';
+	import SectionHead from '$lib/components/ui/SectionHead.svelte';
+	import { pad } from '$lib/utils/format';
 
 	const serviceLines = [
 		{
@@ -25,19 +28,30 @@
 		{
 			title: 'Engineering & WebGL',
 			lede: 'SvelteKit builds with WebGL storytelling, edge deployments, and performance tuned for launch.',
-			items: ['SvelteKit + Vite delivery', 'WebGL & shader development', 'Edge/CDN pipelines', 'QA & automation']
+			items: [
+				'SvelteKit + Vite delivery',
+				'WebGL & shader development',
+				'Edge/CDN pipelines',
+				'QA & automation'
+			]
 		},
 		{
 			title: 'Launch & enablement',
 			lede: 'Runway for go-live: content choreography, playbooks, and teams trained to operate the system.',
-			items: ['Content & SEO choreography', 'Motion/interaction handoff', 'Launch playbooks', 'Team enablement']
+			items: [
+				'Content & SEO choreography',
+				'Motion/interaction handoff',
+				'Launch playbooks',
+				'Team enablement'
+			]
 		}
 	];
 
 	const engagementModels = [
 		{
 			name: 'Sprint',
-			description: '2–4 weeks of concentrated discovery and prototyping to define direction and validate risk.',
+			description:
+				'2–4 weeks of concentrated discovery and prototyping to define direction and validate risk.',
 			bestFor: ['Early-stage teams', 'Positioning a new product', 'Validating motion or WebGL concepts']
 		},
 		{
@@ -48,88 +62,163 @@
 		},
 		{
 			name: 'Retainer',
-			description: 'Continuous evolution, experiments, and governance with monthly capacity you can depend on.',
+			description:
+				'Continuous evolution, experiments, and governance with monthly capacity you can depend on.',
 			bestFor: ['Ongoing growth', 'Labs & R&D tracks', 'Governance & QA rituals']
 		}
 	];
 </script>
 
-<PageSection id="services-hero" tone="contrast" padding="xl">
-	<div class="space-y-6">
-		<span class="eyebrow text-secondary/80">Services</span>
-		<h1 class="text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
-			From zero to launch: strategy, design systems, WebGL, and engineering.
-		</h1>
-		<p class="max-w-3xl text-base text-base-content/70 sm:text-lg">
-			Choose the engagement model that fits your stage. We choreograph motion, content, and code to
-			ship cinematic experiences with rigor.
-		</p>
-		<div class="flex flex-wrap gap-3">
-			<a href="/contact" class="btn btn-primary btn-lg">Start a project</a>
-			<a href="/capabilities" class="btn btn-outline btn-lg">See capability matrix</a>
-		</div>
-	</div>
-</PageSection>
+<PageHeader
+	label="Services"
+	title="From zero to launch: strategy, design systems, WebGL, and engineering."
+	lead="Choose the engagement model that fits your stage. We choreograph motion, content, and code to ship cinematic experiences with rigor."
+>
+	{#snippet actions()}
+		<a class="button" href="/contact">Start a project</a>
+		<a class="button button--quiet" href="/capabilities">See capability matrix</a>
+	{/snippet}
+</PageHeader>
 
-<PageSection id="service-lines">
-	<div class="grid gap-6 md:grid-cols-2">
-		{#each serviceLines as line}
-			<div class="surface-card h-full">
-				<div class="flex items-start justify-between gap-4">
-					<div class="space-y-2">
-						<h2 class="text-xl font-semibold text-base-content">{line.title}</h2>
-						<p class="text-sm text-base-content/70">{line.lede}</p>
-					</div>
-					<span class="rounded-full bg-primary/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-primary/80">
-						Core
-					</span>
+<section class="wrap" aria-labelledby="lines-title">
+	<h2 class="sr-only" id="lines-title">Service lines</h2>
+	<ol class="lines" role="list">
+		{#each serviceLines as line, index (line.title)}
+			<li class="grid line" data-reveal>
+				<p class="label index">{pad(index + 1)} <span>Core</span></p>
+				<div class="summary">
+					<h3 class="h3">{line.title}</h3>
+					<p class="secondary">{line.lede}</p>
 				</div>
-				<ul class="mt-4 space-y-2 text-sm text-base-content/70">
-					{#each line.items as item}
-						<li class="flex items-start gap-2">
-							<span class="mt-[6px] inline-flex h-1.5 w-1.5 rounded-full bg-primary/60"></span>
-							<span>{item}</span>
-						</li>
+				<ul class="items" role="list">
+					{#each line.items as item (item)}
+						<li>{item}</li>
 					{/each}
 				</ul>
-			</div>
+			</li>
 		{/each}
-	</div>
-</PageSection>
+	</ol>
+</section>
 
-<PageSection id="engagement-models" tone="subtle">
-	<div class="space-y-6 text-center">
-		<span class="eyebrow text-secondary/80">Engagement models</span>
-		<h2 class="text-3xl font-semibold sm:text-4xl">Pick the pace. We calibrate the team.</h2>
-	</div>
-
-	<div class="grid gap-6 md:grid-cols-3">
-		{#each engagementModels as model}
-			<div class="surface-panel h-full bg-base-100/80">
-				<h3 class="text-xl font-semibold text-base-content">{model.name}</h3>
-				<p class="mt-2 text-sm text-base-content/70">{model.description}</p>
-				<div class="mt-4 space-y-2 text-xs uppercase tracking-[0.24em] text-base-content/60">
-					{#each model.bestFor as item}
-						<div class="rounded-full bg-base-200/70 px-3 py-2 text-left text-base-content/70">
-							{item}
-						</div>
+<section class="section wrap" aria-labelledby="models-title">
+	<SectionHead
+		index="02"
+		label="Engagement models"
+		title="Pick the pace. We calibrate the team."
+		id="models-title"
+	/>
+	<div class="models">
+		{#each engagementModels as model, index (model.name)}
+			<article class="model" data-reveal>
+				<p class="label">{pad(index + 1)}</p>
+				<h3 class="h3">{model.name}</h3>
+				<p class="secondary">{model.description}</p>
+				<h4 class="label best">Best for</h4>
+				<ul role="list">
+					{#each model.bestFor as item (item)}
+						<li>{item}</li>
 					{/each}
-				</div>
-			</div>
+				</ul>
+			</article>
 		{/each}
 	</div>
-</PageSection>
+</section>
 
-<PageSection id="services-cta" padding="compact">
-	<div class="surface-panel mx-auto max-w-4xl bg-base-100/80 text-center">
-		<h2 class="text-2xl font-semibold sm:text-3xl">Tell us what you’re building.</h2>
-		<p class="mt-3 text-sm text-base-content/70 sm:text-base">
-			Send a short brief or call for pitch. We’ll respond with a tailored squad and a clear path to
-			launch.
-		</p>
-		<div class="mt-6 flex flex-wrap justify-center gap-3">
-			<a href="/contact" class="btn btn-primary btn-sm sm:btn-md">Contact the studio</a>
-			<a href="/work" class="btn btn-ghost btn-sm sm:btn-md">View recent work</a>
-		</div>
-	</div>
-</PageSection>
+<CtaBand
+	title="Tell us what you’re building."
+	copy="Send a short brief or call for pitch. We’ll respond with a tailored squad and a clear path to launch."
+>
+	{#snippet actions()}
+		<a class="button" href="/contact">Contact the studio</a>
+		<a class="button button--quiet" href="/work">View recent work</a>
+	{/snippet}
+</CtaBand>
+
+<style>
+	.lines {
+		border-bottom: var(--hairline) solid var(--line);
+	}
+
+	.line {
+		row-gap: var(--space-4);
+		padding-block: var(--space-6) var(--space-7);
+		border-top: var(--hairline) solid var(--line);
+	}
+
+	.line:first-child {
+		border-top-color: var(--fg);
+	}
+
+	.index {
+		grid-column: 1 / span 2;
+		display: flex;
+		gap: var(--space-4);
+		padding-top: 0.55em;
+	}
+
+	.index span {
+		color: var(--accent);
+	}
+
+	.summary {
+		grid-column: 3 / span 6;
+	}
+
+	.summary p {
+		max-width: 30em;
+		margin-top: var(--space-3);
+	}
+
+	.items {
+		grid-column: 9 / -1;
+		padding-top: 0.4em;
+	}
+
+	.items li {
+		padding-block: var(--space-2);
+		color: var(--fg-2);
+	}
+
+	.items li + li {
+		border-top: var(--hairline) solid var(--line);
+	}
+
+	.models {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: var(--gutter);
+	}
+
+	.model {
+		display: flex;
+		flex-direction: column;
+		padding-top: var(--space-5);
+		border-top: var(--hairline) solid var(--fg);
+	}
+
+	.model h3 {
+		margin-block: var(--space-6) var(--space-4);
+	}
+
+	.best {
+		margin-block: var(--space-6) var(--space-3);
+	}
+
+	.model li {
+		padding-block: var(--space-2);
+		border-top: var(--hairline) solid var(--line);
+	}
+
+	@media (max-width: 63.99rem) {
+		.index,
+		.summary,
+		.items {
+			grid-column: 1 / -1;
+		}
+
+		.models {
+			grid-template-columns: 1fr;
+			row-gap: var(--space-8);
+		}
+	}
+</style>

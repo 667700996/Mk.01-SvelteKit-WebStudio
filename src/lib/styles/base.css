@@ -128,7 +128,12 @@ ol[role='list'] {
 }
 
 .section {
-	padding-block: var(--section);
+	padding-block: var(--section) 0;
+}
+
+/* Spacing is owned by the top edge, so adjacent sections never double up. */
+main > :last-child {
+	padding-bottom: var(--section);
 }
 
 .rule {
