@@ -1,61 +1,187 @@
 <script lang="ts">
-	import PageSection from '$lib/components/ui/PageSection.svelte';
-	import type { PageData } from './$types';
+	import CtaBand from '$lib/components/ui/CtaBand.svelte';
+	import PageHeader from '$lib/components/ui/PageHeader.svelte';
+	import SectionHead from '$lib/components/ui/SectionHead.svelte';
+	import { pad } from '$lib/utils/format';
 
-	export let data: PageData;
+	let { data } = $props();
 
-	const members = data.team ?? [];
+	/** First letter of up to two words: "Mira Park" → "MP", "이준호" → "이". */
+	function monogram(name: string) {
+		return name
+			.split(/\s+/)
+			.slice(0, 2)
+			.map((word) => Array.from(word)[0])
+			.join('')
+			.toUpperCase();
+	}
 </script>
 
-<PageSection id="team-hero" tone="contrast" padding="xl">
-	<div class="space-y-6 text-center">
-		<span class="eyebrow text-secondary/80">Team</span>
-		<h1 class="mx-auto max-w-4xl text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
-			The constellation behind Mk.01 experiments and launches.
-		</h1>
-		<p class="mx-auto max-w-3xl text-base text-base-content/70 sm:text-lg">
-			Distributed across Seoul, Busan, Tokyo, and beyond, the team blends strategy, design systems,
-			motion direction, and engineering discipline.
-		</p>
-	</div>
-</PageSection>
+<PageHeader
+	label="Team"
+	title="The constellation behind Mk.01 experiments and launches."
+	lead="Distributed across Seoul, Busan, Tokyo, and beyond, the team blends strategy, design systems, motion direction, and engineering discipline."
+/>
 
-<PageSection id="team-grid">
-	<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-		{#each members as member}
-			<article class="surface-card h-full">
-				<div class="flex items-start gap-4">
-					<div class="avatar">
-						<div class="w-16 rounded-full ring ring-primary/30 ring-offset-2 ring-offset-base-200">
-							<img src={member.avatar} alt={member.name} loading="lazy" decoding="async" />
-						</div>
-					</div>
-					<div class="space-y-1">
-						<h2 class="text-xl font-semibold text-base-content">{member.name}</h2>
-						<p class="text-sm text-base-content/60">{member.title}</p>
-						<p class="text-xs uppercase tracking-[0.22em] text-primary/70">{member.location}</p>
-					</div>
+<section class="wrap" aria-label="Team members">
+	<ul class="members" role="list">
+		{#each data.team as member, index (member.name)}
+			<li class="member" data-reveal>
+				<div class="portrait" aria-hidden="true">
+					<span class="monogram">{monogram(member.name)}</span>
+					<span class="label corner">{pad(index + 1)}</span>
+					<span class="label corner corner--end">{member.location}</span>
 				</div>
-				<ul class="mt-4 flex flex-wrap gap-2 text-[0.75rem] uppercase tracking-[0.18em] text-base-content/70">
-					{#each member.specialties as specialty}
-						<li class="rounded-full bg-base-200/70 px-3 py-2">{specialty}</li>
+				<h2 class="h4">{member.name}</h2>
+				<p class="secondary">{member.title}</p>
+				<p class="label location">{member.location}</p>
+				<ul class="specialties" role="list" aria-label="Specialties">
+					{#each member.specialties as specialty (specialty)}
+						<li>{specialty}</li>
 					{/each}
 				</ul>
-			</article>
+			</li>
 		{/each}
-	</div>
-</PageSection>
+	</ul>
+</section>
 
-<PageSection id="team-cta" tone="subtle" padding="compact">
-	<div class="surface-panel mx-auto max-w-4xl bg-base-100/80 text-center">
-		<h2 class="text-2xl font-semibold sm:text-3xl">Build with us.</h2>
-		<p class="mt-3 text-sm text-base-content/70 sm:text-base">
-			We assemble a bespoke crew for every engagement. Tell us what you’re building and we’ll
-			pair the right specialists.
-		</p>
-		<div class="mt-6 flex flex-wrap justify-center gap-3">
-			<a href="/contact" class="btn btn-primary btn-sm sm:btn-md">Start a scope</a>
-			<a href="/about" class="btn btn-ghost btn-sm sm:btn-md">Learn about the studio</a>
-		</div>
-	</div>
-</PageSection>
+<section class="section wrap" aria-labelledby="timeline-title">
+	<SectionHead index="02" label="Timeline" title="How the studio grew." id="timeline-title" />
+	<ol class="timeline" role="list">
+		{#each data.timeline as item (item.year)}
+			<li class="grid entry" data-reveal>
+				<p class="h3 tabular year">{item.year}</p>
+				<h3 class="h4">{item.title}</h3>
+				<p class="secondary">{item.description}</p>
+			</li>
+		{/each}
+	</ol>
+</section>
+
+<CtaBand
+	title="Build with us."
+	copy="We assemble a bespoke crew for every engagement. Tell us what you’re building and we’ll pair the right specialists."
+>
+	{#snippet actions()}
+		<a class="button" href="/contact">Start a scope</a>
+		<a class="button button--quiet" href="/about">Learn about the studio</a>
+	{/snippet}
+</CtaBand>
+
+<style>
+	.members {
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		column-gap: var(--gutter);
+		row-gap: var(--space-8);
+	}
+
+	.portrait {
+		position: relative;
+		display: grid;
+		place-items: center;
+		aspect-ratio: 4 / 5;
+		margin-bottom: var(--space-5);
+		border-radius: var(--radius-l);
+		background: var(--bg-raised);
+		background-image: radial-gradient(var(--line-strong) 1px, transparent 1px);
+		background-size: 20px 20px;
+		background-position: center;
+	}
+
+	.monogram {
+		font-size: clamp(3rem, 2rem + 3vw, 5rem);
+		font-weight: 600;
+		letter-spacing: -0.05em;
+		line-height: 1;
+	}
+
+	.corner {
+		position: absolute;
+		top: var(--space-4);
+		left: var(--space-4);
+	}
+
+	.corner--end {
+		left: auto;
+		right: var(--space-4);
+	}
+
+	.member .secondary {
+		margin-top: var(--space-1);
+	}
+
+	.location {
+		margin-top: var(--space-3);
+	}
+
+	.specialties {
+		margin-top: var(--space-5);
+		border-top: var(--hairline) solid var(--line);
+	}
+
+	.specialties li {
+		padding-block: var(--space-2);
+		border-bottom: var(--hairline) solid var(--line);
+		font-size: var(--text-small);
+		color: var(--fg-2);
+	}
+
+	.timeline {
+		border-bottom: var(--hairline) solid var(--line);
+	}
+
+	.entry {
+		row-gap: var(--space-2);
+		align-items: baseline;
+		padding-block: var(--space-5);
+		border-top: var(--hairline) solid var(--line);
+	}
+
+	.year {
+		grid-column: 1 / span 3;
+	}
+
+	.entry h3 {
+		grid-column: 4 / span 3;
+	}
+
+	.entry p.secondary {
+		grid-column: 7 / -1;
+		max-width: 34em;
+	}
+
+	@media (max-width: 63.99rem) {
+		.members {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+
+		.year {
+			grid-column: 1 / span 3;
+		}
+
+		.entry h3 {
+			grid-column: 4 / -1;
+		}
+
+		.entry p.secondary {
+			grid-column: 4 / -1;
+		}
+	}
+
+	@media (max-width: 47.99rem) {
+		.members {
+			grid-template-columns: 1fr;
+		}
+
+		.portrait {
+			aspect-ratio: 16 / 10;
+		}
+
+		.year,
+		.entry h3,
+		.entry p.secondary {
+			grid-column: 1 / -1;
+		}
+	}
+</style>

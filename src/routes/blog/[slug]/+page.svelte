@@ -1,142 +1,274 @@
 <script lang="ts">
-import PageSection from '$lib/components/ui/PageSection.svelte';
-import type { PageData } from './$types';
+	import '$lib/styles/prose.css';
+	import { siteConfig } from '$lib/config/site';
+	import PostIndex from '$lib/components/journal/PostIndex.svelte';
+	import { formatDate } from '$lib/utils/format';
+	import type { PageData } from './$types';
 
-export let data: PageData;
+	let { data }: { data: PageData } = $props();
 
-const tags = data.tags ?? [];
-const related = data.related ?? [];
-
-	const dateFormatter = new Intl.DateTimeFormat('en', {
-		year: 'numeric',
-		month: 'long',
-		day: 'numeric'
-	});
-
-	function formatDate(value: string | number | Date) {
-		try {
-			return dateFormatter.format(new Date(value));
-		} catch {
-			return value;
-		}
-	}
+	const post = $derived(data.post);
+	const Body = $derived(data.Body);
+	const subject = $derived(encodeURIComponent(`Re: ${post.title}`));
 </script>
 
-<PageSection id="article-hero" tone="contrast" padding="compact">
-	<div class="space-y-6">
-		<a href="/blog" class="link-cta" data-sveltekit-preload-data="hover">
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				class="h-4 w-4 rotate-180"
-				fill="none"
-				viewBox="0 0 24 24"
-				stroke="currentColor"
-			>
-				<path
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					stroke-width="1.5"
-					d="M17 8l4 4m0 0l-4 4m4-4H3"
-				/>
-			</svg>
-			Back to journal
+<article class="wrap article" aria-labelledby="article-title">
+	<header class="grid head">
+		<a class="label back" href="/blog">
+			<span class="arrow" aria-hidden="true">←</span> Journal
 		</a>
-		<div class="space-y-3">
-			<div class="flex gap-4">
-				<span class="eyebrow text-secondary/80">Journal Entry</span>
-				<a href={`/blog/category/${data.category?.toLowerCase()}`} data-sveltekit-preload-data="hover">
-					<span class="eyebrow text-accent/80">{data.category}</span>
-				</a>
-			</div>
-			<h1 class="text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">{data.title}</h1>
-			{#if data.description}
-				<p class="max-w-3xl text-base text-base-content/70 sm:text-lg">{data.description}</p>
+		<div class="title-block">
+			<p class="label kicker">
+				<a href="/blog/category/{post.category.toLowerCase()}">{post.category}</a>
+				<span aria-hidden="true">/</span>
+				<time datetime={post.date}>{formatDate(post.date)}</time>
+			</p>
+			<h1 id="article-title" class="h1">{post.title}</h1>
+			{#if post.description}
+				<p class="lead">{post.description}</p>
 			{/if}
 		</div>
-		<div
-			class="flex flex-wrap items-center gap-4 text-xs uppercase tracking-widest text-base-content/60"
-		>
-			<span>{formatDate(data.date)}</span>
-			{#if data.readingTime}
-				<span>{data.readingTime} min read</span>
-			{/if}
-			{#if data.wordCount}
-				<span>{data.wordCount} words</span>
-			{/if}
-			{#if tags.length}
-				<ul class="flex flex-wrap gap-2 text-[0.65rem]">
-					{#each tags as tag}
-						<li class="rounded-full bg-primary/10 px-3 py-1 text-primary/80">#{tag}</li>
-					{/each}
-				</ul>
-			{/if}
+	</header>
+
+	<div class="grid layout">
+		<aside class="meta" aria-label="Entry details">
+			<dl>
+				<div>
+					<dt class="label">Published</dt>
+					<dd><time datetime={post.date}>{formatDate(post.date)}</time></dd>
+				</div>
+				<div>
+					<dt class="label">Reading time</dt>
+					<dd class="tabular">{post.readingTime} min · {post.wordCount} words</dd>
+				</div>
+				<div>
+					<dt class="label">Author</dt>
+					<dd>{post.author}</dd>
+				</div>
+				{#if post.tags.length}
+					<div>
+						<dt class="label">Tags</dt>
+						<dd>
+							<ul role="list" class="tags">
+								{#each post.tags as tag (tag)}
+									<li>
+										<a class="tag" href="/blog?tag={encodeURIComponent(tag.toLowerCase())}">#{tag}</a>
+									</li>
+								{/each}
+							</ul>
+						</dd>
+					</div>
+				{/if}
+			</dl>
+		</aside>
+
+		<div class="prose body">
+			<Body />
 		</div>
 	</div>
-</PageSection>
+</article>
 
-<PageSection id="article-body">
-	{#await import(`../../../posts/${data.slug}.md`)}
-		<article
-			class="prose prose-base max-w-none text-base-content sm:prose-lg lg:prose-xl prose-headings:font-semibold prose-a:text-primary"
-		>
-			<p>Loading...</p>
-		</article>
-	{:then mod}
-		<article
-			class="prose prose-base max-w-none text-base-content sm:prose-lg lg:prose-xl prose-headings:font-semibold prose-a:text-primary"
-		>
-			<svelte:component this={mod.default} />
-		</article>
-	{:catch error}
-		<article
-			class="prose prose-base max-w-none text-base-content sm:prose-lg lg:prose-xl prose-headings:font-semibold prose-a:text-primary"
-		>
-			<p>Error: {error.message}</p>
-		</article>
-	{/await}
-</PageSection>
-
-{#if related.length}
-	<PageSection id="related-articles" tone="subtle" padding="compact">
-		<div class="space-y-6">
-			<h2 class="text-2xl font-semibold text-base-content sm:text-3xl">Related entries</h2>
-			<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-				{#each related as post}
-					<article class="surface-card h-full">
-						<div class="space-y-2">
-							<span class="eyebrow text-accent/80">{post.category}</span>
-							<h3 class="text-xl font-semibold text-base-content hover:text-primary">
-								<a href={`/blog/${post.slug}`} data-sveltekit-preload-data="hover">{post.title}</a>
-							</h3>
-							<p class="text-sm text-base-content/70 line-clamp-3">{post.description}</p>
-						</div>
-						<ul
-							class="mt-4 flex flex-wrap gap-2 text-[0.7rem] uppercase tracking-[0.22em] text-primary/70"
-						>
-							{#each (post.tags?.slice(0, 4) ?? []) as tag}
-								<li class="rounded-full bg-primary/10 px-3 py-1">#{tag}</li>
-							{/each}
-						</ul>
-						<a href={`/blog/${post.slug}`} class="link-cta mt-4 inline-flex" data-sveltekit-preload-data="hover">
-							Read entry
-						</a>
-					</article>
-				{/each}
-			</div>
+{#if data.related.length}
+	<section class="wrap related" aria-labelledby="related-title">
+		<div class="grid related-head">
+			<h2 id="related-title" class="label">Related entries</h2>
 		</div>
-	</PageSection>
+		<PostIndex posts={data.related} />
+	</section>
 {/if}
 
-<PageSection id="article-cta" tone="subtle" padding="compact">
-	<div class="surface-panel mx-auto max-w-4xl bg-base-100/80 text-center">
-		<h2 class="text-2xl font-semibold sm:text-3xl">Continue the conversation?</h2>
-		<p class="mt-3 text-sm text-base-content/70 sm:text-base">
-			Send thoughts, questions, or collaboration ideas. We love hearing how these explorations
-			resonate.
-		</p>
-		<div class="mt-6 flex flex-wrap justify-center gap-3">
-			<a href="mailto:studio@mk1.dev" class="btn btn-primary btn-sm sm:btn-md">Email the studio</a>
-			<a href="/#latest" class="btn btn-ghost btn-sm sm:btn-md">Browse more entries</a>
+<section class="wrap cta" aria-labelledby="cta-title">
+	<div class="grid">
+		<p class="label cta-label">Continue the conversation</p>
+		<div class="cta-body">
+			<h2 id="cta-title" class="h2">Thoughts, questions, or a project in mind?</h2>
+			<p class="secondary">
+				Send a note. It is always good to hear how these explorations land.
+			</p>
+			<div class="actions">
+				<a class="button" href="mailto:{siteConfig.contactEmail}?subject={subject}">
+					Email the studio
+				</a>
+				<a class="button button--quiet" href="/blog">
+					Browse the journal <span class="arrow" aria-hidden="true">→</span>
+				</a>
+			</div>
 		</div>
 	</div>
-</PageSection>
+</section>
+
+<style>
+	.article {
+		padding-top: clamp(3rem, 1.5rem + 5vw, 6rem);
+	}
+
+	.head {
+		row-gap: var(--space-6);
+		padding-bottom: clamp(3rem, 2rem + 4vw, 6rem);
+		border-bottom: var(--hairline) solid var(--line);
+	}
+
+	.back {
+		grid-column: 1 / span 3;
+		align-self: start;
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-2);
+		min-height: 2.75rem;
+		margin-top: -0.85rem;
+		width: fit-content;
+		transition: color var(--duration-2) var(--ease-out);
+	}
+
+	.back:hover {
+		color: var(--fg);
+	}
+
+	.back:hover .arrow {
+		transform: translateX(-3px);
+	}
+
+	.title-block {
+		grid-column: 4 / -1;
+	}
+
+	.kicker {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-3);
+		margin-bottom: var(--space-5);
+	}
+
+	.kicker a {
+		color: var(--accent);
+	}
+
+	.kicker a:hover {
+		text-decoration: underline;
+		text-underline-offset: 0.2em;
+	}
+
+	h1 {
+		max-width: 18ch;
+		animation: rise var(--duration-4) var(--ease-out) both;
+	}
+
+	.title-block .lead {
+		max-width: 32em;
+		margin-top: var(--space-6);
+		animation: rise var(--duration-4) var(--ease-out) 80ms both;
+	}
+
+	@keyframes rise {
+		from {
+			opacity: 0;
+			transform: translateY(0.75rem);
+		}
+	}
+
+	.layout {
+		padding-top: var(--space-8);
+	}
+
+	.meta {
+		grid-column: 1 / span 3;
+	}
+
+	.meta dl {
+		position: sticky;
+		top: calc(var(--nav-height) + var(--space-6));
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-5);
+	}
+
+	dd {
+		margin-top: var(--space-1);
+		font-size: var(--text-small);
+	}
+
+	.tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-1) var(--space-3);
+	}
+
+	.tag {
+		color: var(--fg-2);
+		transition: color var(--duration-2) var(--ease-out);
+	}
+
+	.tag:hover {
+		color: var(--accent);
+	}
+
+	.body {
+		grid-column: 4 / span 7;
+		min-width: 0;
+	}
+
+	.related {
+		padding-top: var(--section);
+	}
+
+	.related-head {
+		padding-bottom: var(--space-4);
+	}
+
+	.related-head h2 {
+		grid-column: 1 / -1;
+	}
+
+	.cta {
+		padding-top: var(--section);
+	}
+
+	.cta-label {
+		grid-column: 1 / span 3;
+		padding-top: 0.75em;
+	}
+
+	.cta-body {
+		grid-column: 4 / -1;
+	}
+
+	.cta h2 {
+		max-width: 16ch;
+	}
+
+	.cta .secondary {
+		margin-top: var(--space-4);
+	}
+
+	.actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-3);
+		margin-top: var(--space-6);
+	}
+
+	@media (max-width: 63.99rem) {
+		.back,
+		.title-block,
+		.meta,
+		.body,
+		.cta-label,
+		.cta-body {
+			grid-column: 1 / -1;
+		}
+
+		.meta dl {
+			position: static;
+			flex-direction: row;
+			flex-wrap: wrap;
+			gap: var(--space-4) var(--space-6);
+			padding-bottom: var(--space-6);
+			margin-bottom: var(--space-6);
+			border-bottom: var(--hairline) solid var(--line);
+		}
+
+		.cta-body {
+			margin-top: var(--space-4);
+		}
+	}
+</style>
