@@ -13,13 +13,14 @@ const config: Config = {
   kit: {
     adapter: adapter(),
     alias: {
-      $components: "src/components",
       $modules: "src/modules",
       $config: "src/config",
       $content: "src/content",
-      $services: "src/services",
-      $styles: "src/styles",
-      $tokens: "src/styles/tokens",
+    },
+    prerender: {
+      // Every internal link is crawled at build time; a broken one fails the build.
+      handleHttpError: "fail",
+      handleMissingId: "fail",
     },
   },
 
