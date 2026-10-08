@@ -6,12 +6,15 @@
 	import '$lib/styles/base.css';
 
 	import interLatin from '@fontsource-variable/inter/files/inter-latin-opsz-normal.woff2?url';
-	import { onNavigate } from '$app/navigation';
+	import { onMount } from 'svelte';
+	import { afterNavigate, onNavigate } from '$app/navigation';
 	import { page } from '$app/state';
 	import { siteConfig } from '$lib/config/site';
 	import { buildSeo, type SeoResult } from '$lib/utils/seo';
 	import CommandPalette from '$lib/components/layout/CommandPalette.svelte';
 	import GridOverlay from '$lib/components/layout/GridOverlay.svelte';
+	import PerfHud from '$lib/components/layout/PerfHud.svelte';
+	import { vitals } from '$lib/state/vitals.svelte';
 	import SiteFooter from '$lib/components/layout/SiteFooter.svelte';
 	import SiteHeader from '$lib/components/layout/SiteHeader.svelte';
 
@@ -26,8 +29,13 @@
 			: ''
 	);
 
+	onMount(() => vitals.start());
+	afterNavigate(({ type }) => type !== 'enter' && vitals.navigationFinished());
+
 	// Cross-fade between routes with the View Transitions API where available.
+	// Elements that share a view-transition-name (plates, titles) morph between pages.
 	onNavigate((navigation) => {
+		vitals.navigationStarted();
 		if (!document.startViewTransition) return;
 		if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 		if (navigation.from?.url.pathname === navigation.to?.url.pathname) return;
@@ -69,6 +77,7 @@
 <SiteFooter />
 <CommandPalette />
 <GridOverlay />
+<PerfHud />
 
 <style>
 	main {

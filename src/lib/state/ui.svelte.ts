@@ -3,6 +3,7 @@ import { browser } from "$app/environment";
 export type ThemePreference = "system" | "light" | "dark";
 
 const THEME_KEY = "mk01-theme";
+const HUD_KEY = "mk01-hud";
 
 /**
  * Global, client-only UI state. Mutated exclusively from event handlers in
@@ -11,6 +12,7 @@ const THEME_KEY = "mk01-theme";
 class UiState {
   paletteOpen = $state(false);
   gridVisible = $state(false);
+  hudVisible = $state(false);
   theme = $state<ThemePreference>("system");
 
   constructor() {
@@ -18,8 +20,19 @@ class UiState {
     try {
       const stored = localStorage.getItem(THEME_KEY);
       if (stored === "light" || stored === "dark") this.theme = stored;
+      this.hudVisible = localStorage.getItem(HUD_KEY) === "1";
     } catch {
       // Storage can be unavailable (private mode, blocked cookies). Fall back to system.
+    }
+  }
+
+  toggleHud() {
+    this.hudVisible = !this.hudVisible;
+    try {
+      if (this.hudVisible) localStorage.setItem(HUD_KEY, "1");
+      else localStorage.removeItem(HUD_KEY);
+    } catch {
+      // Non-fatal.
     }
   }
 

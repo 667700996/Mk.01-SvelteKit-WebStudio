@@ -41,6 +41,14 @@
 		themeAction('dark', 'Use dark appearance'),
 		themeAction('system', 'Match system appearance'),
 		{
+			id: 'hud',
+			group: 'Actions',
+			label: 'Toggle performance HUD',
+			description: 'Shortcut: P',
+			keywords: ['vitals', 'lcp', 'fps', 'metrics', 'speed'],
+			run: () => ui.toggleHud()
+		},
+		{
 			id: 'grid',
 			group: 'Actions',
 			label: 'Toggle layout grid',
@@ -78,7 +86,7 @@
 	const ordered = $derived(groups.flatMap(([, items]) => items));
 
 	function isDefault(entry: Entry) {
-		return entry.group === 'Pages' || entry.group === 'Work' || entry.id === 'copy-email';
+		return entry.group === 'Pages' || entry.group === 'Work' || entry.id === 'copy-email' || entry.id === 'hud';
 	}
 
 	function loadIndex() {
@@ -148,6 +156,8 @@
 			ui.paletteOpen = true;
 		} else if (event.key.toLowerCase() === 'g') {
 			ui.gridVisible = !ui.gridVisible;
+		} else if (event.key.toLowerCase() === 'p') {
+			ui.toggleHud();
 		}
 	}
 

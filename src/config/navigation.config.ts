@@ -44,6 +44,7 @@ export const footerNav: NavGroup[] = [
     title: "Studio",
     links: [
       { label: "Contact", href: "/contact" },
+      { label: "Colophon", href: "/colophon" },
       { label: "Privacy", href: "/privacy" },
       { label: "Terms", href: "/terms" },
       { label: "RSS", href: "/rss.xml" },
@@ -61,4 +62,5 @@ export const paletteNav: NavLink[] = [
   { label: "Team", href: "/team", description: "The people behind Mk.01" },
   { label: "Stack", href: "/stack", description: "Tools and platforms" },
   { label: "Open source", href: "/open-source", description: "Libraries and starters" },
+  { label: "Colophon", href: "/colophon", description: "How this site is built, measured live" },
 ];

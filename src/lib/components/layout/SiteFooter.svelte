@@ -33,7 +33,7 @@
 			<p class="label">© 2026 MK.01</p>
 			<p class="label">Seoul <LocalTime /></p>
 			<p class="label shortcuts">
-				<Kbd keys={['mod', 'K']} /> Search <Kbd keys={['G']} /> Grid
+				<Kbd keys={['mod', 'K']} /> Search <Kbd keys={['G']} /> Grid <Kbd keys={['P']} /> Metrics
 			</p>
 			<ThemeSwitch />
 		</div>
