@@ -35,3 +35,8 @@ export function slugify(value: string) {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
 }
+
+/** Typographic figures: "-60%" → "−60%", "Weeks 1-2" → "Weeks 1–2". */
+export function figure(value: string) {
+  return value.replace(/(\d)-(?=\d)/g, "$1–").replace(/(^|\s)-(?=\d)/g, "$1−");
+}

@@ -1,19 +1,26 @@
-import type { PageServerLoad } from "./$types";
-import { getAllPosts } from "$lib/server/content";
+import type { EntryGenerator, PageServerLoad } from "./$types";
+
 import { error } from "@sveltejs/kit";
 
-export const load: PageServerLoad = async ({ params }) => {
-  const { category } = params;
-  const posts = (await getAllPosts()).filter(
-    (post) => post.category?.toLowerCase() === category.toLowerCase(),
-  );
+import { getAllPosts, getCategories } from "$lib/server/content";
+import { buildSeo } from "$lib/utils/seo";
 
-  if (!posts.length) {
-    throw error(404, `No posts found in category: ${category}`);
-  }
+export const entries: EntryGenerator = () =>
+  getCategories().map((category) => ({ category: category.slug }));
+
+export const load: PageServerLoad = ({ params }) => {
+  const slug = params.category.toLowerCase();
+  const category = getCategories().find((entry) => entry.slug === slug);
+  if (!category) error(404, `No entries in category: ${params.category}`);
 
   return {
-    posts,
     category,
+    categories: getCategories(),
+    posts: getAllPosts().filter((post) => post.category.toLowerCase() === slug),
+    seo: buildSeo({
+      title: `${category.name} — Journal`,
+      description: `Entries filed under ${category.name} in the Mk.01 studio journal.`,
+      path: `/blog/category/${category.slug}`,
+    }),
   };
 };

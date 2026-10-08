@@ -15,6 +15,8 @@
 			.join('')
 			.toUpperCase();
 	}
+
+	const isHangul = (value: string) => /[\u3131-\uD79D]/.test(value);
 </script>
 
 <PageHeader
@@ -28,9 +30,8 @@
 		{#each data.team as member, index (member.name)}
 			<li class="member" data-reveal>
 				<div class="portrait" aria-hidden="true">
-					<span class="monogram">{monogram(member.name)}</span>
+					<span class="monogram" class:hangul={isHangul(member.name)} lang={isHangul(member.name) ? 'ko' : undefined}>{monogram(member.name)}</span>
 					<span class="label corner">{pad(index + 1)}</span>
-					<span class="label corner corner--end">{member.location}</span>
 				</div>
 				<h2 class="h4">{member.name}</h2>
 				<p class="secondary">{member.title}</p>
@@ -96,15 +97,16 @@
 		line-height: 1;
 	}
 
+	/* Hangul glyphs are built from jamo; tight Latin tracking breaks them apart. */
+	.monogram.hangul {
+		letter-spacing: 0;
+		font-weight: 500;
+	}
+
 	.corner {
 		position: absolute;
 		top: var(--space-4);
 		left: var(--space-4);
-	}
-
-	.corner--end {
-		left: auto;
-		right: var(--space-4);
 	}
 
 	.member .secondary {

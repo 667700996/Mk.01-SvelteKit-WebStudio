@@ -1,49 +1,77 @@
-# Mk.01 Design System Foundations
+# Mk.01 Design System
 
-## 1. Type Ramp
+One neutral ramp, one accent, one sans, one mono, one grid. Everything lives in
+`src/lib/styles/tokens.css`; components reference tokens by name and never
+hard-code a colour, duration or size.
 
-- **Display:** `Sora` — expressive headings, large hero statements.
-- **Body:** `Inter` — legible copy, UI text, captions.
-- **Mono:** `JetBrains Mono` — code snippets and technical callouts.
+## Principles
 
-| Token         | Usage            | Size                        |
-| ------------- | ---------------- | --------------------------- |
-| `display-2xl` | Hero headlines   | clamp(3.5rem, 6vw, 4.5rem)  |
-| `display-xl`  | Section headings | clamp(2.75rem, 5vw, 3.5rem) |
-| `display-lg`  | Article titles   | clamp(2rem, 3vw, 2.75rem)   |
-| `text-lg`     | Body lead        | 1.125rem / 1.8              |
-| `text-base`   | Standard copy    | 1rem / 1.7                  |
-| `text-sm`     | Meta info        | 0.95rem / 1.5               |
+- **Reduce until it carries intent.** Hairlines, whitespace and type do the work;
+  boxes, gradients and glows are not used.
+- **The system voice is mono.** Index numbers, metadata and captions are set in
+  IBM Plex Mono, uppercase, 12px. Content is set in Inter.
+- **Motion explains, never decorates.** Idle surfaces are still; motion answers
+  input. Every animation has a reduced-motion equivalent.
+- **Performance is a design constraint.** The largest element on every page
+  paints immediately and is never animated in.
 
-## 2. Color System
+## Type
 
-- **Primary (`#6366F1` → `#A855F7` gradient):** Hero, CTAs, accents.
-- **Secondary (`#0EA5E9`):** Interactive markers, lab highlights.
-- **Accent (`#F97316`):** Motion cues, badges, status indicators.
-- **Neutral:** Base background `#F8FAFC`, content `#0F172A`, overlays `#1E293B`.
-- **Dark Mode:** Mirror palette with desaturated primaries, deeper neutrals.
+| Token            | Use                       | Size (320 → 1600px)    | Tracking |
+| ---------------- | ------------------------- | ---------------------- | -------- |
+| `--text-display` | Page-defining statements  | 52 → 168px             | −0.052em |
+| `--text-h1`      | Page titles               | 44 → 104px             | −0.045em |
+| `--text-h2`      | Section titles            | 34 → 68px              | −0.036em |
+| `--text-h3`      | Sub-sections              | 24 → 36px              | −0.024em |
+| `--text-lead`    | Introductions             | 19 → 24px              | −0.016em |
+| `--text-body`    | Copy                      | 17px / 1.55            | −0.011em |
+| `--text-label`   | Mono metadata             | 12px, uppercase        | +0.04em  |
 
-## 3. Spacing & Layout
+Inter is self-hosted with the optical-size axis, so display sizes get the
+tighter Display cut automatically. Utilities: `.display .h1 .h2 .h3 .h4 .lead
+.label .secondary .muted`.
 
-- **Baseline grid:** 4px; component rhythm built around multiples of 8/12/16.
-- **Section padding tokens:** `section-compact` (48px), `section-default` (64px), `section-xl` (96px).
-- **Max-widths:** `content` (720px), `wide` (1024px), `full` (1240px).
-- **Cards:** 24px inner padding, 20px corner radius, subtle glassmorphism blur.
+## Colour
 
-## 4. Motion
+| Token          | Light     | Dark      | Contrast on bg |
+| -------------- | --------- | --------- | -------------- |
+| `--fg`         | `#0b0b0c` | `#f3f3f4` | 19.7 / 17.7    |
+| `--fg-2`       | `#4b4c52` | `#a6a7ad` | 8.6 / 8.2      |
+| `--fg-3`       | `#6e6f76` | `#86878e` | 5.0 / 5.5      |
+| `--accent`     | `#2450e6` | `#7b96ff` | 6.2 / 7.2      |
+| `--line`       | `#e4e4e7` | `#232326` | decorative     |
+| `--line-control` | `#8b8c93` | `#6a6b72` | ≥ 3:1 (WCAG 1.4.11) |
 
-- **Easing:** `cubic-bezier(0.16, 1, 0.3, 1)` for hero/CTA transitions; `ease-out` for microinteractions.
-- **Durations:** 120ms (micro), 240ms (standard), 420ms (hero/section enters).
-- **Utilities:** Tailwind keyframes (gradient shift, float, fade/slide) to be attached to hero art and interactive modules.
+Every text token passes WCAG AA on both `--bg` and `--bg-raised`. The theme
+follows the OS unless the visitor picks Light/Dark (footer switch or ⌘K); the
+choice is applied before first paint by an inline script in `app.html`.
 
-## 5. Accessibility Guardrails
+## Grid & space
 
-- Color contrast ≥ 4.5:1 for body text, 3:1 for large text.
-- Motion reduction support via `prefers-reduced-motion`.
-- Focus styles with dual indicators (outline + background shift).
+- 12 columns, fluid margin `clamp(20px, …, 72px)`, gutter `clamp(16px, …, 32px)`,
+  max width 1600px. Use `.wrap` + `.grid`; sections label in columns 1–3 and set
+  content from column 4.
+- 4px base spacing (`--space-1` … `--space-10`); sections are separated by
+  `--section` (96 → 192px), owned by the top edge so it never doubles.
+- Press **G** anywhere to overlay the live grid with its measured values.
 
-## 6. Implementation Roadmap
+## Motion
 
-1. Extend Tailwind theme with fonts, spacing scale, shadows, animations, and DaisyUI custom themes (`studio-light`, `studio-dark`).
-2. Build reusable primitives: `Card`, `Badge`, `Stat`, `SectionHeading`, `RichLink`.
-3. Define token documentation and usage stories (Storybook or mdsvex-driven style guide).
+- Curves: `--ease-out` (default), `--ease-in-out`; durations 120 / 220 / 420 / 800ms.
+- `data-reveal` uses CSS scroll-driven animation (`animation-timeline: view()`):
+  zero JavaScript, and unsupported browsers simply show the content.
+- Route changes cross-fade with the View Transitions API; the header is excluded
+  so it stays perfectly still.
+- Canvas pieces (`SignalField`, `LabCanvas`) sleep off-screen and in hidden tabs,
+  cap DPR at 2, read colours from tokens, and render on demand under reduced motion.
+
+## Components
+
+| Component        | Purpose                                                    |
+| ---------------- | ---------------------------------------------------------- |
+| `PageHeader`     | Label, title, lead and actions for every secondary page    |
+| `SectionHead`    | Indexed section label + title + intro on the 12-col grid   |
+| `Plate`          | Resolution-independent drawing for each case study         |
+| `LabGlyph`       | Deterministic per-experiment drawing                       |
+| `CommandPalette` | Native `<dialog>` combobox, fuzzy search over a static index |
+| `Kbd`, `LocalTime`, `ThemeSwitch`, `CtaBand` | Small, single-purpose primitives |

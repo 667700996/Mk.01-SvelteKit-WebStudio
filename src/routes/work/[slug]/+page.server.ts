@@ -1,4 +1,4 @@
-import type { PageServerLoad } from "./$types";
+import type { EntryGenerator, PageServerLoad } from "./$types";
 
 import { error } from "@sveltejs/kit";
 
@@ -6,26 +6,28 @@ import { loadProject } from "$content";
 import { sampleProjects } from "$modules/work";
 import { buildSeo } from "$lib/utils/seo";
 
+export const entries: EntryGenerator = () =>
+  sampleProjects.map(({ slug }) => ({ slug }));
+
 export const load: PageServerLoad = ({ params }) => {
-  const project = sampleProjects.find((item) => item.slug === params.slug);
+  const index = sampleProjects.findIndex((item) => item.slug === params.slug);
+  const project = sampleProjects[index];
   const content = loadProject(params.slug);
 
   if (!project || !content) {
-    throw error(404, `Project not found: ${params.slug}`);
+    error(404, `Project not found: ${params.slug}`);
   }
 
-  const related = sampleProjects
-    .filter((item) => item.slug !== project.slug)
-    .slice(0, 2);
+  const next = sampleProjects[(index + 1) % sampleProjects.length];
 
   return {
     project: { ...project, content },
-    related,
+    index,
+    next,
     seo: buildSeo({
       title: `${project.title} — Case study`,
       description: project.summary,
       path: `/work/${project.slug}`,
-      image: "/og.png",
       type: "article",
       tags: project.tags,
     }),

@@ -81,7 +81,7 @@
 	</div>
 
 	<nav id="mobile-menu" class="sheet" aria-label="Mobile" hidden={!menuOpen}>
-		<ul role="list" class="wrap">
+		<ul role="list">
 			{#each primaryNav as link, index (link.href)}
 				<li style:--i={index}>
 					<a href={link.href} aria-current={isCurrent(link.href) ? 'page' : undefined}>
@@ -255,7 +255,7 @@
 	}
 
 	.sheet ul {
-		padding-block: var(--space-5) var(--space-8);
+		padding: var(--space-5) var(--margin) var(--space-8);
 	}
 
 	.sheet a {
@@ -264,11 +264,10 @@
 		font-size: 2rem;
 		font-weight: 600;
 		letter-spacing: -0.035em;
-		color: var(--fg-2);
 	}
 
 	.sheet a[aria-current='page'] {
-		color: var(--fg);
+		color: var(--fg-3);
 	}
 
 	.sheet:not([hidden]) li {

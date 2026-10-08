@@ -95,6 +95,7 @@
 		color: var(--fg);
 		overflow: hidden;
 		isolation: isolate;
+		container-type: inline-size;
 	}
 
 	svg {
@@ -137,9 +138,15 @@
 		gap: var(--space-4);
 	}
 
+	/* Narrow plates keep only the index, so the caption never collides. */
+	@container (max-width: 26rem) {
+		figcaption span:last-child {
+			display: none;
+		}
+	}
+
 	/* Motion: idle is still. Hovering the owning `.plate-host` sets the system moving. */
 	.orbit,
-	.waves path,
 	.block {
 		transform-box: view-box;
 		transform-origin: 200px 150px;
@@ -159,10 +166,10 @@
 	}
 
 	.waves path {
-		stroke-dasharray: 520;
-		stroke-dashoffset: 0;
-		transition: stroke-dashoffset 1.4s var(--ease-out);
-		transition-delay: calc(var(--i) * 25ms);
+		transform-box: fill-box;
+		transform-origin: center;
+		transition: transform 1.1s var(--ease-out);
+		transition-delay: calc(var(--i) * 30ms);
 	}
 
 	@media (prefers-reduced-motion: no-preference) {
@@ -179,7 +186,7 @@
 		}
 
 		:global(.plate-host:is(:hover, :focus-visible)) .waves path {
-			stroke-dashoffset: 1040;
+			transform: scaleY(1.7);
 		}
 
 		:global(.plate-host:is(:hover, :focus-visible)) .block--a {

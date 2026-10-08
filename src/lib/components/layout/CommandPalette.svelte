@@ -46,7 +46,9 @@
 			label: 'Toggle layout grid',
 			description: 'Shortcut: G',
 			keywords: ['columns', 'debug', 'design'],
-			run: () => (ui.gridVisible = !ui.gridVisible)
+			run: () => {
+				ui.gridVisible = !ui.gridVisible;
+			}
 		}
 	];
 

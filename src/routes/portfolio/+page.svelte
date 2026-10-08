@@ -1,135 +1,122 @@
 <script lang="ts">
-	import PageSection from '$lib/components/ui/PageSection.svelte';
-	import type { PageData } from './$types';
+	import CtaBand from '$lib/components/ui/CtaBand.svelte';
+	import PageHeader from '$lib/components/ui/PageHeader.svelte';
+	import Plate, { plateForProject } from '$lib/components/ui/Plate.svelte';
+	import { pad } from '$lib/utils/format';
 
-	export let data: PageData;
-
-	const projects = data.projects ?? [];
+	let { data } = $props();
 </script>
 
-<PageSection id="portfolio-hero" tone="contrast" padding="xl">
-	<div class="space-y-6 text-center">
-		<span class="eyebrow text-secondary/80">Portfolio</span>
-		<h1 class="mx-auto max-w-4xl text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
-			A curated library of Mk.01 case studies and immersive launches.
-		</h1>
-		<p class="mx-auto max-w-3xl text-base text-base-content/70 sm:text-lg">
-			Explore narrative websites, design systems, and R&D experiments that shipped for partners
-			across entertainment, fintech, wellness, and more.
-		</p>
-	</div>
-</PageSection>
+<PageHeader
+	label="Portfolio"
+	title="A curated library of Mk.01 case studies and immersive launches."
+	lead="Explore narrative websites, design systems, and R&D experiments that shipped for partners across entertainment, fintech, wellness, and more."
+/>
 
-<PageSection id="portfolio-grid">
-	<div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-		{#each projects as project}
-			<article class="portfolio-card">
-				<div class="media">
-					<img
-						src={project.coverImage}
-						alt={project.title}
-						loading="lazy"
-						decoding="async"
-						width="960"
-						height="640"
+<section class="wrap" aria-label="Case studies">
+	<ul class="library" role="list">
+		{#each data.projects as project, index (project.slug)}
+			<li data-reveal>
+				<a class="entry plate-host" href="/work/{project.slug}">
+					<Plate
+						kind={plateForProject[project.slug] ?? 'orbital'}
+						index="MK / Case {pad(index + 1)}"
+						caption="Case study"
+						ratio="4 / 5"
 					/>
-					<div class="pill">{project.industry}</div>
-				</div>
-				<div class="body">
-					<h2>{project.title}</h2>
-					<p>{project.summary}</p>
-					<ul>
-						{#each project.tags as tag}
-							<li>#{tag}</li>
-						{/each}
-					</ul>
-					<a href={`/work/${project.slug}`} class="link-cta" data-sveltekit-preload-data="hover">
-						View case study
-					</a>
-				</div>
-			</article>
+					<p class="label meta">
+						<span>{pad(index + 1)}</span>
+						<span>{project.industry}</span>
+						<span class="year">{project.year}</span>
+					</p>
+					<h2 class="h3">{project.title}</h2>
+					<p class="secondary">{project.summary}</p>
+					<p class="label tags">{project.tags.join(' / ')}</p>
+					<span class="open">View case study <span class="arrow" aria-hidden="true">→</span></span>
+				</a>
+			</li>
 		{/each}
-	</div>
-</PageSection>
+	</ul>
+</section>
 
-<PageSection id="portfolio-cta" tone="subtle" padding="compact">
-	<div class="surface-panel mx-auto max-w-4xl bg-base-100/80 text-center">
-		<h2 class="text-2xl font-semibold sm:text-3xl">Need a bespoke build?</h2>
-		<p class="mt-3 text-sm text-base-content/70 sm:text-base">
-			Share your brief and we’ll assemble the right squad—strategy, motion, WebGL, and engineering—
-			to ship it.
-		</p>
-		<div class="mt-6 flex flex-wrap justify-center gap-3">
-			<a href="/contact" class="btn btn-primary btn-sm sm:btn-md">Start a scope</a>
-			<a href="/capabilities" class="btn btn-ghost btn-sm sm:btn-md">View capabilities</a>
-		</div>
-	</div>
-</PageSection>
+<CtaBand
+	title="Need a bespoke build?"
+	copy="Share your brief and we’ll assemble the right squad—strategy, motion, WebGL, and engineering—to ship it."
+>
+	{#snippet actions()}
+		<a class="button" href="/contact">Start a scope</a>
+		<a class="button button--quiet" href="/capabilities">View capabilities</a>
+	{/snippet}
+</CtaBand>
 
 <style>
-	.portfolio-card {
+	.library {
 		display: grid;
-		gap: 1rem;
-		border-radius: 1.5rem;
-		overflow: hidden;
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		background: linear-gradient(150deg, rgba(12, 17, 35, 0.92), rgba(75, 88, 255, 0.18));
-		box-shadow: 0 24px 60px rgba(5, 12, 38, 0.35);
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		column-gap: var(--gutter);
+		row-gap: var(--space-9);
 	}
 
-	.media {
-		position: relative;
-		overflow: hidden;
-	}
-
-	.media img {
-		display: block;
-		width: 100%;
+	.entry {
+		display: flex;
+		flex-direction: column;
 		height: 100%;
-		object-fit: cover;
-		transition: transform 400ms ease, filter 400ms ease;
 	}
 
-	.portfolio-card:hover .media img {
-		transform: scale(1.04);
-		filter: saturate(125%);
+	.entry :global(.plate) {
+		transition: transform var(--duration-4) var(--ease-out);
 	}
 
-	.pill {
-		position: absolute;
-		top: 1rem;
-		right: 1rem;
-		padding: 0.4rem 0.8rem;
-		border-radius: 999px;
-		background: rgba(15, 23, 42, 0.7);
-		color: rgba(226, 232, 255, 0.88);
-		font-size: 0.75rem;
-		text-transform: uppercase;
-		letter-spacing: 0.18em;
+	.entry:hover :global(.plate) {
+		transform: scale(0.99);
 	}
 
-	.body {
-		display: grid;
-		gap: 0.6rem;
-		padding: 0 1.4rem 1.4rem;
-		color: rgba(226, 232, 255, 0.9);
+	.meta {
+		display: flex;
+		gap: var(--space-4);
+		margin-top: var(--space-5);
+		padding-bottom: var(--space-4);
+		border-bottom: var(--hairline) solid var(--line);
+	}
+
+	.year {
+		margin-left: auto;
 	}
 
 	h2 {
-		font-size: 1.3rem;
-		font-weight: 600;
+		margin-top: var(--space-5);
 	}
 
-	p {
-		color: rgba(226, 232, 255, 0.7);
-		line-height: 1.6;
+	.entry .secondary {
+		margin-top: var(--space-3);
+		max-width: 28em;
 	}
 
-	ul {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.4rem;
-		font-size: 0.75rem;
-		color: rgba(226, 232, 255, 0.65);
+	.tags {
+		margin-top: var(--space-4);
+	}
+
+	.open {
+		margin-top: auto;
+		padding-top: var(--space-5);
+		font-weight: 520;
+		transition: color var(--duration-2) var(--ease-out);
+	}
+
+	.entry:hover .open {
+		color: var(--accent);
+	}
+
+	@media (max-width: 63.99rem) {
+		.library {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+
+	@media (max-width: 47.99rem) {
+		.library {
+			grid-template-columns: 1fr;
+			row-gap: var(--space-8);
+		}
 	}
 </style>

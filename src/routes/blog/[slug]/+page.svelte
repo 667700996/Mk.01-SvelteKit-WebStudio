@@ -1,5 +1,6 @@
 <script lang="ts">
 	import '$lib/styles/prose.css';
+	import { scrollableCode } from '$lib/actions/scrollableCode';
 	import { siteConfig } from '$lib/config/site';
 	import PostIndex from '$lib/components/journal/PostIndex.svelte';
 	import { formatDate } from '$lib/utils/format';
@@ -62,7 +63,7 @@
 			</dl>
 		</aside>
 
-		<div class="prose body">
+		<div class="prose body" use:scrollableCode>
 			<Body />
 		</div>
 	</div>
@@ -150,7 +151,6 @@
 
 	h1 {
 		max-width: 18ch;
-		animation: rise var(--duration-4) var(--ease-out) both;
 	}
 
 	.title-block .lead {

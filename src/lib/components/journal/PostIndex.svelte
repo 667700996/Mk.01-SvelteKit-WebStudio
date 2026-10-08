@@ -19,7 +19,7 @@
 			<time class="label date" datetime={post.date}>{formatDate(post.date, 'short')}</time>
 			<p class="label category">{post.category}</p>
 			<div class="body">
-				<svelte:element this="h{headingLevel}" class="h4 title">
+				<svelte:element this={`h${headingLevel}`} class="h4 title">
 					<a href="/blog/{post.slug}">{post.title}</a>
 				</svelte:element>
 				{#if post.description}

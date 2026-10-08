@@ -88,8 +88,8 @@
 		<div class="hero-title">
 			<p class="kicker">We make technology feel inevitable.</p>
 			<h1 id="hero-title" class="display">
-				<span class="line"><span>Digital matter,</span></span>
-				<span class="line"><span>engineered<em>.</em></span></span>
+				<span class="line">Digital matter,</span>
+				<span class="line">engineered<em>.</em></span>
 			</h1>
 		</div>
 
@@ -301,32 +301,14 @@
 		animation: rise var(--duration-4) var(--ease-out) 0.25s both;
 	}
 
+	/* The headline is the LCP element: it paints at once, never animated in. */
 	h1 .line {
 		display: block;
-		overflow: hidden;
-		/* Room for descenders inside the mask. */
-		padding-bottom: 0.06em;
-		margin-bottom: -0.06em;
-	}
-
-	h1 .line > span {
-		display: block;
-		animation: line-in 1.1s var(--ease-out) both;
-	}
-
-	h1 .line:nth-child(2) > span {
-		animation-delay: 90ms;
 	}
 
 	h1 em {
 		font-style: normal;
 		color: var(--accent);
-	}
-
-	@keyframes line-in {
-		from {
-			transform: translateY(105%);
-		}
 	}
 
 	@keyframes rise {
@@ -649,6 +631,10 @@
 
 		.disciplines {
 			grid-template-columns: 1fr;
+		}
+
+		.disciplines h3 {
+			margin-top: var(--space-2);
 		}
 
 		.caption {

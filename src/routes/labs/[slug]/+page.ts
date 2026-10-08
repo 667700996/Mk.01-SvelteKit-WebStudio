@@ -1,32 +1,37 @@
-import type { PageLoad } from "./$types";
+import type { EntryGenerator, PageLoad } from "./$types";
 
 import { error } from "@sveltejs/kit";
 
-import { getExperiment, loadProject } from "$content";
+import { getExperiment } from "$content";
 import { labExperiments } from "$modules/labs";
 import { buildSeo } from "$lib/utils/seo";
 
-export const load: PageLoad = ({ params }) => {
-  const experimentMeta = labExperiments.find(
-    (item) => item.slug === params.slug,
-  );
-  const experimentContent = getExperiment(params.slug);
+export const entries: EntryGenerator = () =>
+  labExperiments.map(({ slug }) => ({ slug }));
 
-  if (!experimentMeta || !experimentContent) {
-    throw error(404, `Experiment ${params.slug} not found`);
+export const load: PageLoad = ({ params }) => {
+  const index = labExperiments.findIndex((item) => item.slug === params.slug);
+  const experiment = labExperiments[index];
+  const content = getExperiment(params.slug);
+
+  if (!experiment || !content) {
+    error(404, `Experiment ${params.slug} not found`);
   }
 
-  const relatedProject = loadProject("neon-metropolis");
+  const count = labExperiments.length;
 
   return {
-    experiment: { ...experimentMeta, content: experimentContent },
-    relatedProject,
+    experiment,
+    index,
+    count,
+    previous: labExperiments[(index - 1 + count) % count],
+    next: labExperiments[(index + 1) % count],
     seo: buildSeo({
-      title: `${experimentMeta.title} – Mk.01 Labs`,
-      description: experimentMeta.summary,
-      path: `/labs/${experimentMeta.slug}`,
-      image: experimentMeta.thumbnail,
+      title: `${experiment.title} — Labs`,
+      description: experiment.summary,
+      path: `/labs/${experiment.slug}`,
       type: "article",
+      tags: experiment.tech,
     }),
   };
 };

@@ -1,5 +1,6 @@
 <script lang="ts">
-	import PageSection from '$lib/components/ui/PageSection.svelte';
+	import PageHeader from '$lib/components/ui/PageHeader.svelte';
+	import { pad } from '$lib/utils/format';
 
 	const layers = [
 		{
@@ -21,32 +22,86 @@
 	];
 </script>
 
-<PageSection id="stack-hero" tone="contrast" padding="xl">
-	<div class="space-y-6 text-center">
-		<span class="eyebrow text-secondary/80">Studio stack</span>
-		<h1 class="mx-auto max-w-4xl text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
-			Tools and platforms powering Mk.01 experiences.
-		</h1>
-		<p class="mx-auto max-w-3xl text-base text-base-content/70 sm:text-lg">
-			Every engagement selects the right combination of tools across strategy, design, motion, and
-			engineering to deliver expressive yet performant products.
-		</p>
-	</div>
-</PageSection>
+<PageHeader
+	label="Studio stack"
+	title="Tools and platforms powering Mk.01 experiences."
+	lead="Every engagement selects the right combination of tools across strategy, design, motion, and engineering to deliver expressive yet performant products."
+/>
 
-<PageSection id="stack-grid">
-	<div class="grid gap-6 md:grid-cols-2">
-		{#each layers as layer}
-			<div class="surface-card h-full">
-				<h2 class="text-xl font-semibold text-base-content">{layer.title}</h2>
-				<ul
-					class="mt-4 flex flex-wrap gap-2 text-xs uppercase tracking-[0.28em] text-base-content/60"
-				>
-					{#each layer.tools as tool}
-						<li class="rounded-full bg-base-200/60 px-3 py-1">{tool}</li>
+<section class="wrap" aria-label="Stack layers">
+	<div class="table">
+		<div class="grid row head" aria-hidden="true">
+			<span class="label">No.</span>
+			<span class="label">Layer</span>
+			<span class="label">Tools</span>
+		</div>
+		{#each layers as layer, index (layer.title)}
+			<div class="grid row" data-reveal>
+				<span class="label index">{pad(index + 1)}</span>
+				<h2 class="h4">{layer.title}</h2>
+				<ul class="tools" role="list" aria-label="{layer.title} tools">
+					{#each layer.tools as tool (tool)}
+						<li>{tool}</li>
 					{/each}
 				</ul>
 			</div>
 		{/each}
 	</div>
-</PageSection>
+</section>
+
+<style>
+	.table {
+		border-bottom: var(--hairline) solid var(--line);
+	}
+
+	.row {
+		align-items: baseline;
+		row-gap: var(--space-3);
+		padding-block: var(--space-5);
+		border-top: var(--hairline) solid var(--line);
+	}
+
+	.head {
+		padding-block: var(--space-3);
+		border-top-color: var(--fg);
+	}
+
+	.row > :nth-child(1) {
+		grid-column: 1 / span 2;
+	}
+
+	.row > :nth-child(2) {
+		grid-column: 3 / span 4;
+	}
+
+	.row > :nth-child(3) {
+		grid-column: 7 / -1;
+	}
+
+	.tools {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-2) var(--space-5);
+		padding: 0;
+		list-style: none;
+		color: var(--fg-2);
+	}
+
+	@media (max-width: 47.99rem) {
+		.head {
+			display: none;
+		}
+
+		.row > :nth-child(1) {
+			grid-column: 1 / span 2;
+		}
+
+		.row > :nth-child(2) {
+			grid-column: 3 / -1;
+		}
+
+		.row > :nth-child(3) {
+			grid-column: 3 / -1;
+		}
+	}
+</style>

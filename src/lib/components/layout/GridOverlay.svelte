@@ -10,7 +10,7 @@
 		const measure = () => {
 			const style = getComputedStyle(target);
 			const count = style.gridTemplateColumns.split(' ').length;
-			spec = `${count} col · ${parseFloat(style.columnGap)}px gutter · ${parseFloat(style.paddingLeft)}px margin`;
+			spec = `${count} col · ${Math.round(parseFloat(style.columnGap))}px gutter · ${Math.round(parseFloat(style.paddingLeft))}px margin`;
 		};
 		const observer = new ResizeObserver(measure);
 		observer.observe(target);

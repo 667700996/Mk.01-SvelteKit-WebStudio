@@ -8,7 +8,8 @@
 
 :root {
 	/* Type families ------------------------------------------------------- */
-	--font-sans: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui,
+	--font-sans: 'Inter Variable', 'Inter', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo',
+		'Noto Sans KR', 'Malgun Gothic', 'Segoe UI', system-ui,
 		sans-serif;
 	--font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 

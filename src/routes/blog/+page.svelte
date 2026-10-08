@@ -362,6 +362,8 @@
 			flex-wrap: nowrap;
 			overflow-x: auto;
 			scrollbar-width: none;
+			padding-right: var(--space-6);
+			mask-image: linear-gradient(to right, #000 calc(100% - 2.5rem), transparent);
 		}
 
 		.categories {

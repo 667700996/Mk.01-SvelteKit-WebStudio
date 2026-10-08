@@ -81,7 +81,7 @@
 </PageHeader>
 
 <section class="wrap" aria-labelledby="lines-title">
-	<h2 class="sr-only" id="lines-title">Service lines</h2>
+	<h2 class="label lines-title" id="lines-title"><span>01</span><span>Service lines</span></h2>
 	<ol class="lines" role="list">
 		{#each serviceLines as line, index (line.title)}
 			<li class="grid line" data-reveal>
@@ -135,6 +135,12 @@
 </CtaBand>
 
 <style>
+	.lines-title {
+		display: flex;
+		gap: var(--space-4);
+		margin-bottom: var(--space-5);
+	}
+
 	.lines {
 		border-bottom: var(--hairline) solid var(--line);
 	}

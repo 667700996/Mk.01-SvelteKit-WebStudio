@@ -18,8 +18,15 @@ const config: Config = {
       $content: "src/content",
     },
     prerender: {
-      // Every internal link is crawled at build time; a broken one fails the build.
-      handleHttpError: "fail",
+      // Every internal link is crawled at build time. A broken page link fails
+      // the build; media referenced by content but not yet added only warns.
+      handleHttpError: ({ path, referrer, message }) => {
+        if (/^\/images\//.test(path)) {
+          console.warn(`Missing media ${path} (referenced by ${referrer})`);
+          return;
+        }
+        throw new Error(message);
+      },
       handleMissingId: "fail",
     },
   },

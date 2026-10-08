@@ -39,7 +39,6 @@
 
 	h1 {
 		max-width: 15ch;
-		animation: rise var(--duration-4) var(--ease-out) both;
 	}
 
 	.lead {

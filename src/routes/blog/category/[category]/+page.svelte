@@ -1,80 +1,94 @@
 <script lang="ts">
+	import PostIndex from '$lib/components/journal/PostIndex.svelte';
+	import PageHeader from '$lib/components/ui/PageHeader.svelte';
 	import type { PageData } from './$types';
 
-	export let data: PageData;
+	let { data }: { data: PageData } = $props();
 
-	const { posts, category } = data;
-
-	const dateFormatter = new Intl.DateTimeFormat('en', {
-		year: 'numeric',
-		month: 'short',
-		day: 'numeric'
-	});
-
-	function formatDate(value: string | number | Date) {
-		try {
-			return dateFormatter.format(new Date(value));
-		} catch {
-			return value;
-		}
-	}
+	const count = $derived(
+		`${data.posts.length} ${data.posts.length === 1 ? 'entry' : 'entries'} in this category.`
+	);
 </script>
 
-<div class="container mx-auto px-4 py-8">
-	<a href="/blog" class="text-blue-500 hover:underline" data-sveltekit-preload-data="hover">&larr; Back to Blog</a>
-	<h1 class="text-3xl font-bold my-4">Posts in category: {category}</h1>
+<PageHeader label="Journal / Category" title={data.category.name} lead={count} />
 
-	<div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-		{#each posts as post}
-			<article class="surface-card flex h-full flex-col justify-between">
-				<div class="space-y-3">
-					<div class="flex justify-between">
-						<span class="eyebrow text-accent/80">{post.category}</span>
-					</div>
-					<div
-						class="flex items-center gap-3 text-xs uppercase tracking-widest text-base-content/60"
+<div class="wrap">
+	<nav class="categories" aria-label="Categories">
+		<ul role="list">
+			<li><a href="/blog">All</a></li>
+			{#each data.categories as entry (entry.slug)}
+				<li>
+					<a
+						href="/blog/category/{entry.slug}"
+						aria-current={entry.slug === data.category.slug ? 'page' : undefined}
 					>
-						<span>{formatDate(post.date)}</span>
-						{#if post.readingTime}
-							<span>{post.readingTime} min read</span>
-						{/if}
-					</div>
-					<h3 class="text-xl font-semibold text-base-content hover:text-primary">
-						<a href={`/blog/${post.slug}`} data-sveltekit-preload-data="hover">
-							{post.title}
-						</a>
-					</h3>
-					<p class="text-sm text-base-content/70">{post.description}</p>
-				</div>
+						{entry.name}
+						<span class="count tabular">{entry.count}</span>
+					</a>
+				</li>
+			{/each}
+		</ul>
+	</nav>
 
-				{#if post.tags?.length}
-					<ul
-						class="mt-6 flex flex-wrap gap-2 text-[0.65rem] uppercase tracking-widest text-primary/70"
-					>
-						{#each post.tags.slice(0, 4) as tag}
-							<li class="rounded-full bg-primary/10 px-3 py-1">#{tag}</li>
-						{/each}
-					</ul>
-				{/if}
+	<PostIndex posts={data.posts} headingLevel={2} />
 
-				<a href={`/blog/${post.slug}`} class="link-cta mt-6" data-sveltekit-preload-data="hover">
-					Read article
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						class="h-4 w-4"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="1.5"
-							d="M17 8l4 4m0 0l-4 4m4-4H3"
-						/>
-					</svg>
-				</a>
-			</article>
-		{/each}
-	</div>
+	<p class="back">
+		<a class="link" href="/blog"><span class="arrow" aria-hidden="true">←</span> Back to the journal</a>
+	</p>
 </div>
+
+<style>
+	.categories {
+		padding-block: var(--space-3);
+		margin-bottom: var(--space-7);
+		border-top: var(--hairline) solid var(--fg);
+		border-bottom: var(--hairline) solid var(--line);
+	}
+
+	.categories ul {
+		display: flex;
+		gap: var(--space-1);
+		margin-left: calc(var(--space-3) * -1);
+		overflow-x: auto;
+		scrollbar-width: none;
+		padding-right: var(--space-6);
+		mask-image: linear-gradient(to right, #000 calc(100% - 2.5rem), transparent);
+	}
+
+	.categories a {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-2);
+		min-height: 2.75rem;
+		padding: 0 var(--space-3);
+		border-radius: 999px;
+		color: var(--fg-2);
+		font-size: var(--text-small);
+		white-space: nowrap;
+		transition: color var(--duration-2) var(--ease-out);
+	}
+
+	.categories a:hover {
+		color: var(--fg);
+	}
+
+	.categories a[aria-current='page'] {
+		background: var(--bg-raised);
+		color: var(--fg);
+		box-shadow: inset 0 0 0 var(--hairline) var(--line);
+	}
+
+	.count {
+		color: var(--fg-3);
+		font-family: var(--font-mono);
+		font-size: var(--text-label);
+	}
+
+	.back {
+		margin-top: var(--space-7);
+	}
+
+	.back a:hover .arrow {
+		transform: translateX(-3px);
+	}
+</style>
